@@ -72,75 +72,113 @@
     }
   }
   
-  /* Move slideshow controls below the slider */
+  /* Professional slideshow controls ON TOP of image */
   .slideshow__controls {
-    position: relative !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    transform: none !important;
-    background: transparent !important;
-    padding: 20px 0 !important;
-    margin-top: 0 !important;
-  }
-  
-  .slideshow__controls--top {
     position: absolute !important;
-    top: auto !important;
-    bottom: 20px !important;
+    bottom: 30px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     z-index: 10;
-    background: rgba(0, 0, 0, 0.3) !important;
-    border-radius: 20px !important;
-    padding: 10px 20px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 30px !important;
+    padding: 12px 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   
-  /* Style for dots below image */
+  .slideshow__controls--top {
+    top: 30px !important;
+    bottom: auto !important;
+  }
+  
+  /* Style for dots on image */
   .slideshow__control-wrapper {
-    display: flex;
+    display: flex !important;
     justify-content: center;
     gap: 8px;
-    padding: 15px 0;
-    background: transparent;
+  }
+  
+  .slider-counter__link {
+    padding: 5px !important;
   }
   
   .slider-counter__link .dot {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.6);
     transition: all 0.3s ease;
+    display: block;
   }
   
   .slider-counter__link--active .dot,
   .slider-counter__link:hover .dot {
-    background: rgba(255, 255, 255, 1);
+    background: #ffffff;
+    border-color: #ffffff;
     transform: scale(1.2);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+  
+  /* Counter style */
+  .slider-counter {
+    color: white !important;
+    font-size: 14px;
+    font-weight: 500;
   }
   
   /* Arrow buttons */
   .slider-button {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
     border: none !important;
     color: white !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
   
   .slider-button:hover {
-    background: rgba(255, 255, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.3) !important;
   }
   
-  /* Hide controls on mobile to save space */
+  .slider-button .svg-wrapper {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Hide on mobile to save space */
   @media screen and (max-width: 749px) {
-    .slideshow__controls--top {
-      bottom: 10px !important;
-      padding: 8px 15px !important;
+    .slideshow__controls {
+      bottom: 15px !important;
+      padding: 8px 16px !important;
+      gap: 10px !important;
+    }
+    
+    .slider-button {
+      width: 32px !important;
+      height: 32px !important;
     }
     
     .slider-counter__link .dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
+    }
+    
+    .slider-counter {
+      font-size: 12px;
+    }
+  }
+  
+  /* Hide arrows on mobile, show only dots */
+  @media screen and (max-width: 480px) {
+    .slider-button {
+      display: none !important;
     }
   }
 </style>
@@ -300,7 +338,7 @@
   </div>
 
   {%- if section.blocks.size > 0 -%}
-  <div class="slideshow__controls slideshow__controls--bottom">
+  <div class="slideshow__controls">
     {%- if section.blocks.size > 1 -%}
       <button
         type="button"
