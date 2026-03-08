@@ -1,795 +1,225 @@
-{{ 'section-slideshow.css' | asset_url | stylesheet_tag }}
 {{ 'component-slider.css' | asset_url | stylesheet_tag }}
 
-{%- style -%}
-  .slideshow-{{ section.id }} {
-    --slideshow-height: {{ section.settings.slide_height }}px;
-    --slideshow-overlay: {{ section.settings.overlay_opacity | divided_by: 100.00 }};
-    --slideshow-arrow-size: {{ section.settings.arrow_size }}px;
-    --slideshow-dot-size: {{ section.settings.dot_size }}px;
-    --slideshow-transition: {{ section.settings.transition_style }};
-    --slideshow-text-align: {{ section.settings.text_align }};
-    --slideshow-text-color: {{ section.settings.text_color }};
-    --slideshow-overlay-color: {{ section.settings.overlay_color }};
-  }
-
-  @media screen and (max-width: 749px) {
-    .slideshow-{{ section.id }} {
-      --slideshow-height: {{ section.settings.slide_height_mobile }}px;
-      --slideshow-arrow-size: {{ section.settings.arrow_size_mobile }}px;
-    }
-  }
-{%- endstyle -%}
-
-<div class="slideshow-wrapper slideshow-{{ section.id }}">
-  <slideshow-component
-    class="slideshow-section"
-    role="region"
-    aria-roledescription="Slideshow"
-    aria-label="{{ section.settings.accessibility | escape }}"
-    data-autoplay="{{ section.settings.auto_rotate }}"
-    data-speed="{{ section.settings.change_slides_speed | times: 1000 }}"
-    data-transition="{{ section.settings.transition_style }}"
-    data-arrow-nav="{{ section.settings.show_arrows }}"
-    data-dot-nav="{{ section.settings.show_dots }}"
-    data-progress="{{ section.settings.show_progress }}"
-    data-hover-pause="{{ section.settings.pause_on_hover }}"
-  >
-    <div class="slideshow slider slider--everywhere" 
-         id="Slideshow-{{ section.id }}"
-         aria-live="polite"
-         aria-atomic="true">
-      
-      {%- for block in section.blocks -%}
-        <div class="slideshow__slide slider__slide{% if section.settings.enable_ken_burns %} ken-burns{% endif %}"
-             id="Slide-{{ section.id }}-{{ forloop.index }}"
-             {{ block.shopify_attributes }}
-             role="group"
-             aria-roledescription="Slide"
-             aria-label="{{ forloop.index }} of {{ forloop.length }}"
-             tabindex="-1"
-             data-slide-index="{{ forloop.index0 }}"
-             {{ block.shopify_attributes }}>
-          
-          <!-- Slide Image -->
-          <div class="slideshow__media">
-            {%- if block.settings.image != blank -%}
-              {%- liquid
-                assign height = block.settings.image.width | divided_by: block.settings.image.aspect_ratio | round
-                assign sizes = '(min-width: 1200px) 100vw, (min-width: 750px) 100vw, 100vw'
-                assign widths = '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
-                assign fetch_priority = 'auto'
-                if forloop.first
-                  assign fetch_priority = 'high'
-                endif
-              -%}
-              
-              {%- if block.settings.mobile_image != blank -%}
-                <picture class="slideshow__picture">
-                  <source
-                    media="(max-width: 749px)"
-                    srcset="{{ block.settings.mobile_image | image_url: width: 750 }}"
-                    width="{{ block.settings.mobile_image.width }}"
-                    height="{{ block.settings.mobile_image.height }}"
-                  >
-                  <source
-                    media="(min-width: 750px)"
-                    srcset="{{ block.settings.image | image_url: width: 3840 }}"
-                    width="{{ block.settings.image.width }}"
-                    height="{{ block.settings.image.height }}"
-                  >
-                  {{
-                    block.settings.image
-                    | image_url: width: 3840
-                    | image_tag: 
-                      class: 'slideshow__image', 
-                      sizes: sizes, 
-                      widths: widths, 
-                      fetchpriority: fetch_priority,
-                      loading: forloop.first ? 'eager' : 'lazy'
-                  }}
-                </picture>
-              {%- else -%}
-                {{
-                  block.settings.image
-                  | image_url: width: 3840
-                  | image_tag: 
-                    class: 'slideshow__image',
-                    sizes: sizes, 
-                    widths: widths, 
-                    fetchpriority: fetch_priority,
-                    loading: forloop.first ? 'eager' : 'lazy'
-                }}
-              {%- endif -%}
-            {%- else -%}
-              {%- assign placeholder_slide = forloop.index | modulo: 2 -%}
-              <div class="slideshow__placeholder">
-                {%- if placeholder_slide == 1 -%}
-                  {{ 'hero-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
-                {%- else -%}
-                  {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
-                {%- endif -%}
-              </div>
-            {%- endif -%}
-            
-            <!-- Image Overlay -->
-            {%- if section.settings.show_overlay -%}
-              <div class="slideshow__overlay"></div>
-            {%- endif -%}
-          </div>
-
-          <!-- Text Content -->
-          {%- if block.settings.title != blank or block.settings.subtitle != blank or block.settings.button_label != blank -%}
-            <div class="slideshow__content-wrapper">
-              <div class="slideshow__content{% if block.settings.content_width == 'narrow' %} content-narrow{% elsif block.settings.content_width == 'wide' %} content-wide{% endif %}">
-                {%- if block.settings.subtitle != blank -%}
-                  <p class="slideshow__subtitle" style="--subtitle-color: {{ block.settings.subtitle_color }}">{{ block.settings.subtitle }}</p>
-                {%- endif -%}
-                
-                {%- if block.settings.title != blank -%}
-                  <h2 class="slideshow__title" style="--title-color: {{ block.settings.title_color }}">{{ block.settings.title }}</h2>
-                {%- endif -%}
-                
-                {%- if block.settings.description != blank -%}
-                  <div class="slideshow__description" style="--desc-color: {{ block.settings.description_color }}">{{ block.settings.description }}</div>
-                {%- endif -%}
-                
-                {%- if block.settings.button_label != blank and block.settings.link != blank -%}
-                  <a href="{{ block.settings.link }}" class="slideshow__button button{% if block.settings.button_style == 'secondary' %} button--secondary{% else %} button--primary{% endif %}">
-                    {{ block.settings.button_label }}
-                  </a>
-                {%- endif -%}
-              </div>
-            </div>
-          {%- endif -%}
-
-          <!-- Slide Link (entire slide clickable) -->
-          {%- if block.settings.link != blank and block.settings.title == blank and block.settings.button_label == blank -%}
-            <a href="{{ block.settings.link }}" class="slideshow__slide-link" aria-label="{{ block.settings.title | default: 'Slide ' | append: forloop.index }}"></a>
-          {%- endif -%}
-        </div>
-      {%- endfor -%}
-    </div>
-
-    <!-- Navigation Arrows -->
-    {%- if section.settings.show_arrows and section.blocks.size > 1 -%}
-      <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous slide" type="button">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next slide" type="button">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    {%- endif -%}
-
-    <!-- Dots Navigation -->
-    {%- if section.settings.show_dots and section.blocks.size > 1 -%}
-      <div class="slideshow__dots">
-        {%- for block in section.blocks -%}
-          <button class="slideshow__dot{% if forloop.first %} active{% endif %}" 
-                  aria-label="Go to slide {{ forloop.index }}"
-                  aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
-                  data-slide="{{ forloop.index0 }}">
-            {%- if section.settings.show_progress -%}
-              <span class="dot-progress">
-                <span class="dot-progress-bar"></span>
-              </span>
-            {%- else -%}
-              <span class="dot"></span>
-            {%- endif -%}
-          </button>
-        {%- endfor -%}
-      </div>
-    {%- endif -%}
-
-    <!-- Progress Bar -->
-    {%- if section.settings.show_progress_bar -%}
-      <div class="slideshow__progress-bar">
-        <div class="slideshow__progress-bar-fill"></div>
-      </div>
-    {%- endif -%}
-  </slideshow-component>
-</div>
-
-{%- if request.design_mode -%}
-  <script src="{{ 'theme-editor.js' | asset_url }}" defer="defer"></script>
-{%- endif -%}
-
-<script>
-  class SlideshowComponent extends HTMLElement {
-    constructor() {
-      super();
-      
-      this.slider = this.querySelector('.slideshow');
-      this.slides = this.querySelectorAll('.slideshow__slide');
-      this.arrows = this.querySelectorAll('.slideshow__arrow');
-      this.dots = this.querySelectorAll('.slideshow__dot');
-      this.progressBar = this.querySelector('.slideshow__progress-bar-fill');
-      
-      this.currentSlide = 0;
-      this.autoplay = this.dataset.autoplay === 'true';
-      this.speed = parseInt(this.dataset.speed) || 5000;
-      this.transition = this.dataset.transition || 'fade';
-      this.pauseOnHover = this.dataset.hoverPause === 'true';
-      this.isHovering = false;
-      
-      this.init();
-    }
-
-    init() {
-      if (this.slides.length <= 1) return;
-      
-      // Set initial state
-      this.slides.forEach((slide, index) => {
-        slide.style.opacity = index === 0 ? '1' : '0';
-        slide.style.visibility = index === 0 ? 'visible' : 'hidden';
-      });
-
-      // Arrow navigation
-      this.arrows.forEach(arrow => {
-        arrow.addEventListener('click', (e) => {
-          e.preventDefault();
-          const direction = arrow.classList.contains('slideshow__arrow--next') ? 1 : -1;
-          this.goToSlide(direction);
-        });
-      });
-
-      // Dot navigation
-      this.dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-          this.goToSlide(index - this.currentSlide);
-        });
-      });
-
-      // Pause on hover
-      if (this.pauseOnHover) {
-        this.addEventListener('mouseenter', () => {
-          this.isHovering = true;
-          this.pauseAutoplay();
-        });
-        this.addEventListener('mouseleave', () => {
-          this.isHovering = false;
-          this.startAutoplay();
-        });
-      }
-
-      // Touch/swipe support
-      this.setupTouchEvents();
-
-      // Keyboard navigation
-      this.setupKeyboardEvents();
-
-      // Start autoplay
-      if (this.autoplay) {
-        this.startAutoplay();
-      }
-
-      // Progress bar
-      if (this.progressBar) {
-        this.updateProgressBar();
-      }
-    }
-
-    goToSlide(direction) {
-      const nextIndex = (this.currentSlide + direction + this.slides.length) % this.slides.length;
-      this.changeSlide(nextIndex);
-    }
-
-    changeSlide(index) {
-      if (index === this.currentSlide) return;
-
-      const currentSlideEl = this.slides[this.currentSlide];
-      const nextSlideEl = this.slides[index];
-
-      // Apply transition based on style
-      if (this.transition === 'fade') {
-        currentSlideEl.style.opacity = '0';
-        currentSlideEl.style.visibility = 'hidden';
-        nextSlideEl.style.opacity = '1';
-        nextSlideEl.style.visibility = 'visible';
-      } else {
-        // Slide transition
-        currentSlideEl.style.transform = `translateX(-${index * 100}%)`;
-        nextSlideEl.style.transform = 'translateX(0)';
-      }
-
-      // Update dots
-      this.dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === index);
-        dot.setAttribute('aria-current', i === index ? 'true' : 'false');
-      });
-
-      this.currentSlide = index;
-
-      // Reset progress
-      if (this.autoplay && !this.isHovering) {
-        this.resetAutoplay();
-      }
-      
-      if (this.progressBar) {
-        this.updateProgressBar();
-      }
-    }
-
-    startAutoplay() {
-      if (!this.autoplay || this.autoplayInterval) return;
-      this.autoplayInterval = setInterval(() => {
-        if (!this.isHovering) {
-          this.goToSlide(1);
-        }
-      }, this.speed);
-    }
-
-    pauseAutoplay() {
-      if (this.autoplayInterval) {
-        clearInterval(this.autoplayInterval);
-        this.autoplayInterval = null;
-      }
-    }
-
-    resetAutoplay() {
-      this.pauseAutoplay();
-      this.startAutoplay();
-    }
-
-    updateProgressBar() {
-      if (!this.progressBar) return;
-      const progress = ((this.currentSlide + 1) / this.slides.length) * 100;
-      this.progressBar.style.width = `${progress}%`;
-    }
-
-    setupTouchEvents() {
-      let touchStartX = 0;
-      let touchEndX = 0;
-
-      this.slider.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
-
-      this.slider.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        this.handleSwipe(touchStartX, touchEndX);
-      }, { passive: true });
-    }
-
-    handleSwipe(start, end) {
-      const threshold = 50;
-      const diff = start - end;
-      
-      if (Math.abs(diff) > threshold) {
-        if (diff > 0) {
-          this.goToSlide(1); // Swipe left - next
-        } else {
-          this.goToSlide(-1); // Swipe right - prev
-        }
-      }
-    }
-
-    setupKeyboardEvents() {
-      this.setAttribute('tabindex', '0');
-      this.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') {
-          this.goToSlide(-1);
-        } else if (e.key === 'ArrowRight') {
-          this.goToSlide(1);
-        }
-      });
-    }
-  }
-
-  customElements.define('slideshow-component', SlideshowComponent);
-</script>
-
 <style>
-  /* Base Styles */
-  .slideshow-section {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    background-color: #f5f5f5;
-  }
-
   .slideshow-wrapper {
     position: relative;
+    width: 100%;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    overflow: hidden;
   }
 
   .slideshow {
-    position: relative;
-    width: 100%;
-    height: var(--slideshow-height, 600px);
-    overflow: hidden;
+    display: flex;
+    transition: transform 0.5s ease-in-out;
   }
 
-  /* Slide Styles */
   .slideshow__slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
-  }
-
-  .slideshow__slide.ken-burns .slideshow__image {
-    animation: kenBurns 20s ease-in-out infinite alternate;
-  }
-
-  @keyframes kenBurns {
-    0% {
-      transform: scale(1);
-    }
-    100% {
-      transform: scale(1.1);
-    }
-  }
-
-  /* Media */
-  .slideshow__media {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    min-width: 100%;
+    position: relative;
   }
 
   .slideshow__image {
     width: 100%;
-    height: 100%;
+    height: 600px;
     object-fit: cover;
-    object-position: center;
+    display: block;
   }
 
-  .slideshow__placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f0f0f0;
-  }
-
-  .slideshow__placeholder .placeholder-svg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* Overlay */
-  .slideshow__overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--slideshow-overlay-color, rgba(0, 0, 0, var(--slideshow-overlay, 0.4)));
-    z-index: 1;
-  }
-
-  /* Content */
-  .slideshow__content-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: var(--slideshow-text-align, center);
-    z-index: 2;
-    padding: 4rem;
-  }
-
-  .slideshow__content {
-    max-width: 700px;
-    text-align: var(--slideshow-text-align, center);
-  }
-
-  .slideshow__content.content-narrow {
-    max-width: 500px;
-  }
-
-  .slideshow__content.content-wide {
-    max-width: 900px;
-  }
-
-  .slideshow__subtitle {
-    font-size: 1.4rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--subtitle-color, #ffffff);
-    margin: 0 0 1rem;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s ease forwards;
-    animation-delay: 0.2s;
-  }
-
-  .slideshow__title {
-    font-size: 4rem;
-    font-weight: 700;
-    line-height: 1.1;
-    color: var(--title-color, #ffffff);
-    margin: 0 0 1.5rem;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s ease forwards;
-    animation-delay: 0.4s;
-  }
-
-  .slideshow__description {
-    font-size: 1.2rem;
-    line-height: 1.6;
-    color: var(--desc-color, rgba(255, 255, 255, 0.9));
-    margin-bottom: 2rem;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s ease forwards;
-    animation-delay: 0.6s;
-  }
-
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
+  @media (max-width: 749px) {
+    .slideshow__image {
+      height: 400px;
     }
   }
 
-  .slideshow__button {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s ease forwards;
-    animation-delay: 0.8s;
+  /* Navigation Dots */
+  .slideshow__nav {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
   }
 
-  /* Navigation Arrows */
+  .slideshow__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .slideshow__dot:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .slideshow__dot.active {
+    background: #fff;
+    transform: scale(1.2);
+  }
+
+  /* Arrow Buttons */
   .slideshow__arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: var(--slideshow-arrow-size, 50px);
-    height: var(--slideshow-arrow-size, 50px);
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
     border-radius: 50%;
-    color: #ffffff;
     cursor: pointer;
     z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
   }
 
   .slideshow__arrow:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-50%) scale(1.1);
-  }
-
-  .slideshow__arrow--prev {
-    left: 2rem;
-  }
-
-  .slideshow__arrow--next {
-    right: 2rem;
+    background: rgba(255, 255, 255, 0.4);
   }
 
   .slideshow__arrow svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
   }
 
-  /* Dots */
-  .slideshow__dots {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 12px;
-    z-index: 10;
-    padding: 12px 20px;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(10px);
-    border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  .slideshow__arrow--prev {
+    left: 20px;
   }
 
-  .slideshow__dot {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    outline: none;
-  }
-
-  .slideshow__dot .dot {
-    display: block;
-    width: var(--slideshow-dot-size, 12px);
-    height: var(--slideshow-dot-size, 12px);
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    transition: all 0.3s ease;
-  }
-
-  .slideshow__dot:hover .dot {
-    background: rgba(255, 255, 255, 0.7);
-    transform: scale(1.2);
-  }
-
-  .slideshow__dot.active .dot {
-    background: #ffffff;
-    border-color: #ffffff;
-    transform: scale(1.2);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  }
-
-  .slideshow__dot .dot-progress {
-    display: block;
-    width: var(--slideshow-dot-size, 12px);
-    height: var(--slideshow-dot-size, 12px);
-  }
-
-  .slideshow__dot .dot-progress-bar {
-    display: none;
-  }
-
-  /* Progress Bar */
-  .slideshow__progress-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.2);
-    z-index: 10;
-  }
-
-  .slideshow__progress-bar-fill {
-    height: 100%;
-    background: #ffffff;
-    transition: width 0.3s ease;
-  }
-
-  /* Slide Link */
-  .slideshow__slide-link {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 3;
-    cursor: pointer;
-  }
-
-  /* Responsive */
-  @media screen and (max-width: 749px) {
-    .slideshow {
-      height: var(--slideshow-height, 400px);
-    }
-
-    .slideshow__content-wrapper {
-      padding: 2rem;
-    }
-
-    .slideshow__title {
-      font-size: 2.5rem;
-    }
-
-    .slideshow__subtitle {
-      font-size: 1rem;
-    }
-
-    .slideshow__description {
-      font-size: 1rem;
-    }
-
-    .slideshow__arrow {
-      width: 40px;
-      height: 40px;
-    }
-
-    .slideshow__arrow--prev {
-      left: 1rem;
-    }
-
-    .slideshow__arrow--next {
-      right: 1rem;
-    }
-
-    .slideshow__dots {
-      bottom: 1.5rem;
-      padding: 8px 16px;
-    }
-  }
-
-  /* Animation classes */
-  .slideshow__slide[data-slide-index].animate .slideshow__subtitle,
-  .slideshow__slide[data-slide-index].animate .slideshow__title,
-  .slideshow__slide[data-slide-index].animate .slideshow__description,
-  .slideshow__slide[data-slide-index].animate .slideshow__button {
-    animation-play-state: running;
+  .slideshow__arrow--next {
+    right: 20px;
   }
 </style>
 
+<div class="slideshow-wrapper">
+  <div class="slideshow" id="Slideshow-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <div class="slideshow__slide" data-index="{{ forloop.index0 }}">
+        {%- if block.settings.image != blank -%}
+          {%- assign image = block.settings.image -%}
+          {{ 
+            image 
+            | image_url: width: 1920 
+            | image_tag: 
+              class: 'slideshow__image',
+              alt: image.alt | escape,
+              loading: forloop.first ? 'eager' : 'lazy'
+          }}
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'slideshow__image' }}
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- if section.blocks.size > 1 -%}
+    <!-- Navigation Arrows -->
+    <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous slide">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next slide">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+
+    <!-- Dots -->
+    <div class="slideshow__nav">
+      {%- for block in section.blocks -%}
+        <button 
+          class="slideshow__dot{% if forloop.first %} active{% endif %}" 
+          data-index="{{ forloop.index0 }}"
+          aria-label="Go to slide {{ forloop.index }}"
+        ></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slideshow = document.getElementById('Slideshow-{{ section.id }}');
+    const slides = slideshow.querySelectorAll('.slideshow__slide');
+    const dots = slideshow.parentElement.querySelectorAll('.slideshow__dot');
+    const prevBtn = slideshow.parentElement.querySelector('.slideshow__arrow--prev');
+    const nextBtn = slideshow.parentElement.querySelector('.slideshow__arrow--next');
+    
+    let currentIndex = 0;
+    let autoplay = {{ section.settings.auto_rotate }};
+    let speed = {{ section.settings.change_slides_speed }} * 1000;
+    let interval;
+
+    function goToSlide(index) {
+      currentIndex = index;
+      if (currentIndex >= slides.length) currentIndex = 0;
+      if (currentIndex < 0) currentIndex = slides.length - 1;
+      
+      slideshow.style.transform = `translateX(-${currentIndex * 100}%)`;
+      
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentIndex);
+      });
+    }
+
+    function nextSlide() {
+      goToSlide(currentIndex + 1);
+    }
+
+    function startAutoplay() {
+      if (autoplay && slides.length > 1) {
+        interval = setInterval(nextSlide, speed);
+      }
+    }
+
+    function stopAutoplay() {
+      clearInterval(interval);
+    }
+
+    // Arrow navigation
+    if (prevBtn) prevBtn.addEventListener('click', () => { stopAutoplay(); goToSlide(currentIndex - 1); startAutoplay(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { stopAutoplay(); goToSlide(currentIndex + 1); startAutoplay(); });
+
+    // Dot navigation
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => { stopAutoplay(); goToSlide(index); startAutoplay(); });
+    });
+
+    // Touch/swipe
+    let touchStartX = 0;
+    slideshow.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, {passive: true});
+    slideshow.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        stopAutoplay();
+        diff > 0 ? goToSlide(currentIndex + 1) : goToSlide(currentIndex - 1);
+        startAutoplay();
+      }
+    }, {passive: true});
+
+    // Start autoplay
+    startAutoplay();
+  });
+</script>
+
 {% schema %}
 {
-  "name": "Professional Slideshow",
+  "name": "Basic Slideshow",
   "tag": "section",
   "class": "section",
   "disabled_on": {
     "groups": ["header", "footer"]
   },
   "settings": [
-    {
-      "type": "header",
-      "content": "General Settings"
-    },
-    {
-      "type": "text",
-      "id": "accessibility",
-      "label": "Accessibility Label",
-      "default": "Slideshow"
-    },
-    {
-      "type": "header",
-      "content": "Layout"
-    },
-    {
-      "type": "range",
-      "id": "slide_height",
-      "min": 300,
-      "max": 1000,
-      "step": 50,
-      "unit": "px",
-      "label": "Desktop Height",
-      "default": 700,
-      "info": "Height of the slideshow on desktop devices"
-    },
-    {
-      "type": "range",
-      "id": "slide_height_mobile",
-      "min": 200,
-      "max": 700,
-      "step": 50,
-      "unit": "px",
-      "label": "Mobile Height",
-      "default": 500,
-      "info": "Height of the slideshow on mobile devices"
-    },
-    {
-      "type": "select",
-      "id": "transition_style",
-      "label": "Transition Style",
-      "options": [
-        {
-          "value": "fade",
-          "label": "Fade"
-        },
-        {
-          "value": "slide",
-          "label": "Slide"
-        }
-      ],
-      "default": "fade"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_ken_burns",
-      "label": "Enable Ken Burns Effect",
-      "default": false,
-      "info": "Adds subtle zoom animation to images"
-    },
-    {
-      "type": "header",
-      "content": "Autoplay"
-    },
     {
       "type": "checkbox",
       "id": "auto_rotate",
@@ -800,267 +230,33 @@
       "type": "range",
       "id": "change_slides_speed",
       "min": 3,
-      "max": 10,
+      "max": 8,
       "step": 1,
       "unit": "s",
       "label": "Change slides every",
       "default": 5
-    },
-    {
-      "type": "checkbox",
-      "id": "pause_on_hover",
-      "label": "Pause on hover",
-      "default": true
-    },
-    {
-      "type": "header",
-      "content": "Navigation"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_arrows",
-      "label": "Show navigation arrows",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_dots",
-      "label": "Show dot navigation",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_progress",
-      "label": "Show progress in dots",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "show_progress_bar",
-      "label": "Show progress bar",
-      "default": false
-    },
-    {
-      "type": "header",
-      "content": "Arrow & Dot Sizes"
-    },
-    {
-      "type": "range",
-      "id": "arrow_size",
-      "min": 30,
-      "max": 80,
-      "step": 5,
-      "unit": "px",
-      "label": "Desktop Arrow Size",
-      "default": 50
-    },
-    {
-      "type": "range",
-      "id": "arrow_size_mobile",
-      "min": 30,
-      "max": 50,
-      "step": 5,
-      "unit": "px",
-      "label": "Mobile Arrow Size",
-      "default": 40
-    },
-    {
-      "type": "range",
-      "id": "dot_size",
-      "min": 8,
-      "max": 20,
-      "step": 2,
-      "unit": "px",
-      "label": "Dot Size",
-      "default": 12
-    },
-    {
-      "type": "header",
-      "content": "Overlay"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_overlay",
-      "label": "Show overlay",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "overlay_opacity",
-      "min": 0,
-      "max": 90,
-      "step": 5,
-      "unit": "%",
-      "label": "Overlay opacity",
-      "default": 40
-    },
-    {
-      "type": "color",
-      "id": "overlay_color",
-      "label": "Overlay Color",
-      "default": "#000000"
-    },
-    {
-      "type": "header",
-      "content": "Text Settings"
-    },
-    {
-      "type": "select",
-      "id": "text_align",
-      "label": "Text Alignment",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "Left"
-        },
-        {
-          "value": "center",
-          "label": "Center"
-        },
-        {
-          "value": "flex-end",
-          "label": "Right"
-        }
-      ],
-      "default": "center"
     }
   ],
   "blocks": [
     {
       "type": "slide",
       "name": "Slide",
-      "limit": 8,
+      "limit": 5,
       "settings": [
-        {
-          "type": "header",
-          "content": "Image"
-        },
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Desktop Image"
-        },
-        {
-          "type": "image_picker",
-          "id": "mobile_image",
-          "label": "Mobile Image"
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Slide Link"
-        },
-        {
-          "type": "header",
-          "content": "Content"
-        },
-        {
-          "type": "text",
-          "id": "subtitle",
-          "label": "Subtitle",
-          "default": "WELCOME TO OUR STORE"
-        },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Title",
-          "default": "Summer Collection 2024"
-        },
-        {
-          "type": "richtext",
-          "id": "description",
-          "label": "Description",
-          "default": "<p>Discover the latest trends and styles for the season.</p>"
-        },
-        {
-          "type": "text",
-          "id": "button_label",
-          "label": "Button Label",
-          "default": "Shop Now"
-        },
-        {
-          "type": "select",
-          "id": "button_style",
-          "label": "Button Style",
-          "options": [
-            {
-              "value": "primary",
-              "label": "Primary"
-            },
-            {
-              "value": "secondary",
-              "label": "Secondary"
-            }
-          ],
-          "default": "primary"
-        },
-        {
-          "type": "select",
-          "id": "content_width",
-          "label": "Content Width",
-          "options": [
-            {
-              "value": "standard",
-              "label": "Standard"
-            },
-            {
-              "value": "narrow",
-              "label": "Narrow"
-            },
-            {
-              "value": "wide",
-              "label": "Wide"
-            }
-          ],
-          "default": "standard"
-        },
-        {
-          "type": "header",
-          "content": "Colors"
-        },
-        {
-          "type": "color",
-          "id": "subtitle_color",
-          "label": "Subtitle Color",
-          "default": "#ffffff"
-        },
-        {
-          "type": "color",
-          "id": "title_color",
-          "label": "Title Color",
-          "default": "#ffffff"
-        },
-        {
-          "type": "color",
-          "id": "description_color",
-          "label": "Description Color",
-          "default": "rgba(255, 255, 255, 0.9)"
+          "label": "Image"
         }
       ]
     }
   ],
   "presets": [
     {
-      "name": "Professional Slideshow",
+      "name": "Basic Slideshow",
       "blocks": [
-        {
-          "type": "slide",
-          "settings": {
-            "subtitle": "NEW ARRIVALS",
-            "title": "Spring Collection",
-            "description": "<p>Explore our latest arrivals for the spring season</p>",
-            "button_label": "Shop Now"
-          }
-        },
-        {
-          "type": "slide",
-          "settings": {
-            "subtitle": "SALE",
-            "title": "Up to 50% Off",
-            "description": "<p>Don't miss our biggest sale of the year</p>",
-            "button_label": "Shop Sale"
-          }
-        }
+        { "type": "slide" },
+        { "type": "slide" }
       ]
     }
   ]
