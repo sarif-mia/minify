@@ -1,5 +1,52 @@
 {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
 
+<style>
+  /* Full viewport width banner */
+  .banner-section {
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .banner-section .banner {
+    width: 100%;
+    max-width: 100vw;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .banner-section .banner__media {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .banner-section .banner__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+  
+  /* Desktop height */
+  @media screen and (min-width: 750px) {
+    .banner-section .banner__media {
+      min-height: 700px;
+    }
+  }
+  
+  /* Mobile height */
+  @media screen and (max-width: 749px) {
+    .banner-section .banner__media {
+      min-height: 500px;
+    }
+  }
+</style>
+
 {%- if section.settings.image_height == 'adapt' and section.settings.image != blank -%}
   {%- style -%}
     @media screen and (max-width: 749px) {
@@ -53,7 +100,7 @@
 
 <div
   id="Banner-{{ section.id }}"
-  class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank %} banner--stacked{% endif %}{% if section.settings.image_height == 'adapt' and section.settings.image != blank %} banner--adapt{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+  class="banner banner-section banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank %} banner--stacked{% endif %}{% if section.settings.image_height == 'adapt' and section.settings.image != blank %} banner--adapt{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
 >
   {%- if section.settings.image != blank -%}
     <div class="banner__media media{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank or section.settings.mobile_image != blank %} banner__media-half{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
@@ -90,7 +137,8 @@
               class: image_class,
               sizes: sizes,
               widths: widths,
-              fetchpriority: fetch_priority
+              fetchpriority: fetch_priority,
+              style: 'width: 100%; height: 100%; object-fit: cover;'
           }}
         </picture>
       {%- else -%}
@@ -103,7 +151,8 @@
             class: image_class,
             sizes: sizes,
             widths: widths,
-            fetchpriority: fetch_priority
+            fetchpriority: fetch_priority,
+            style: 'width: 100%; height: 100%; object-fit: cover;'
         }}
       {%- endif -%}
     </div>
@@ -136,7 +185,8 @@
           class: image_class_2,
           sizes: sizes,
           widths: widths,
-          fetchpriority: fetch_priority
+          fetchpriority: fetch_priority,
+          style: 'width: 100%; height: 100%; object-fit: cover;'
       }}
     </div>
   {%- endif -%}
@@ -235,18 +285,22 @@
         },
         {
           "value": "small",
-          "label": "Small"
+          "label": "Small (400px)"
         },
         {
           "value": "medium",
-          "label": "Medium"
+          "label": "Medium (500px)"
         },
         {
           "value": "large",
-          "label": "Large"
+          "label": "Large (700px)"
+        },
+        {
+          "value": "fullscreen",
+          "label": "Fullscreen"
         }
       ],
-      "default": "medium",
+      "default": "large",
       "label": "Image height"
     },
     {

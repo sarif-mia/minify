@@ -2,6 +2,76 @@
 {{ 'component-slider.css' | asset_url | stylesheet_tag }}
 {{ 'component-slideshow.css' | asset_url | stylesheet_tag }}
 
+<style>
+  /* Full viewport width slideshow */
+  .slideshow-section {
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  
+  .slideshow-section .banner {
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  .slideshow-section .banner__media {
+    width: 100%;
+    height: 100%;
+    min-height: 50vh;
+  }
+  
+  .slideshow-section .banner__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  /* Full viewport width banner */
+  .banner-section {
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  
+  .banner-section .banner {
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  .banner-section .banner__media {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .banner-section .banner__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  /* Desktop height */
+  @media screen and (min-width: 750px) {
+    .slideshow-section .banner__media,
+    .banner-section .banner__media {
+      min-height: 700px;
+    }
+  }
+  
+  /* Mobile height */
+  @media screen and (max-width: 749px) {
+    .slideshow-section .banner__media,
+    .banner-section .banner__media {
+      min-height: 500px;
+    }
+  }
+</style>
+
 {%- if section.settings.slide_height == 'adapt_image' and section.blocks.first.settings.image != blank -%}
   {%- style -%}
     @media screen and (max-width: 749px) {
@@ -26,7 +96,7 @@
 {%- endif -%}
 
 <slideshow-component
-  class="slider-mobile-gutter{% if section.settings.layout == 'grid' %} page-width{% endif %}{% if section.settings.show_text_below %} mobile-text-below{% endif %}"
+  class="slideshow-section slider-mobile-gutter{% if section.settings.layout == 'grid' %} page-width{% endif %}{% if section.settings.show_text_below %} mobile-text-below{% endif %}"
   role="region"
   aria-roledescription="{{ 'sections.slideshow.carousel' | t }}"
   aria-label="{{ section.settings.accessibility_info | escape }}"
@@ -131,7 +201,7 @@
             {%- liquid
               assign height = block.settings.image.width | divided_by: block.settings.image.aspect_ratio | round
               if section.settings.image_behavior == 'ambient'
-                assign sizes = '120vw'
+                assign sizes = '100vw'
                 assign widths = '450, 660, 900, 1320, 1800, 2136, 2400, 3600, 7680'
               else
                 assign sizes = '100vw'
@@ -156,13 +226,13 @@
                   {{
                     block.settings.image
                     | image_url: width: 3840
-                    | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority
+                    | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority, class: 'slideshow__image'
                   }}
                 {%- else -%}
                   {{
                     block.settings.image
                     | image_url: width: 3840
-                    | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
+                    | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths, class: 'slideshow__image'
                   }}
                 {%- endif -%}
               </picture>
@@ -171,13 +241,13 @@
                 {{
                   block.settings.image
                   | image_url: width: 3840
-                  | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority
+                  | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority, class: 'slideshow__image'
                 }}
               {%- else -%}
                 {{
                   block.settings.image
                   | image_url: width: 3840
-                  | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
+                  | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths, class: 'slideshow__image'
                 }}
               {%- endif -%}
             {%- endif -%}
@@ -330,6 +400,21 @@
     position: relative;
     z-index: 2;
   }
+  
+  .slideshow__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover !important;
+    object-position: center center;
+  }
+  
+  /* Full width slider */
+  #Slider-{{ section.id }}.banner {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
 </style>
 
 {%- if request.design_mode -%}
@@ -371,18 +456,22 @@
         },
         {
           "value": "small",
-          "label": "Small"
+          "label": "Small (400px)"
         },
         {
           "value": "medium",
-          "label": "Medium"
+          "label": "Medium (500px)"
         },
         {
           "value": "large",
-          "label": "Large"
+          "label": "Large (700px)"
+        },
+        {
+          "value": "fullscreen",
+          "label": "Fullscreen"
         }
       ],
-      "default": "medium",
+      "default": "large",
       "label": "Slide height"
     },
     {
