@@ -250,7 +250,7 @@
 
 <script>
   (function() {
-    const wrapper = document.querySelector('.slideshow-section');
+    const wrapper = document.getElementById('Slideshow-{{ section.id }}').parentElement;
     if (!wrapper) return;
     
     const slideshow = wrapper.querySelector('.slideshow');
@@ -263,12 +263,13 @@
     
     let currentIndex = 0;
     const totalSlides = slides.length;
-    const autoRotate = {{ section.settings.auto_rotate }};
-    const speed = {{ section.settings.change_slides_speed }} * 1000;
+    const autoRotate = {{ section.settings.auto_rotate | default: true | json }};
+    const speed = {{ section.settings.change_slides_speed | default: 5 }} * 1000;
     let autoplayInterval;
 
     // Set initial position
     slideshow.style.transition = 'transform 0.5s ease-in-out';
+    slideshow.style.transform = 'translateX(0)';
 
     function goToSlide(index) {
       currentIndex = index;
