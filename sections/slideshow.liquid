@@ -15,40 +15,33 @@
   }
 
   /* Height settings */
-  {%- case section.settings.image_height -%}
-    {%- when 'small' -%}
-      .slideshow { height: 300px; }
-    {%- when 'medium' -%}
-      .slideshow { height: 500px; }
-    {%- when 'large' -%}
-      .slideshow { height: 700px; }
-    {%- when 'fullscreen' -%}
-      .slideshow { height: 100vh; }
-    {%- when 'adapt' -%}
-      .slideshow { height: auto; aspect-ratio: 16/7; }
-    {%- when 'custom' -%}
-      .slideshow { height: {{ section.settings.custom_height }}px; }
-    {%- else -%}
-      .slideshow { height: auto; aspect-ratio: 16/7; }
-  {%- endcase -%}
+  .slideshow { height: 600px; }
+  
+  {%- if section.settings.image_height == 'small' -%}
+    @media screen and (min-width: 750px) { .slideshow { height: 300px; } }
+  {%- elsif section.settings.image_height == 'medium' -%}
+    @media screen and (min-width: 750px) { .slideshow { height: 500px; } }
+  {%- elsif section.settings.image_height == 'large' -%}
+    @media screen and (min-width: 750px) { .slideshow { height: 700px; } }
+  {%- elsif section.settings.image_height == 'fullscreen' -%}
+    @media screen and (min-width: 750px) { .slideshow { height: 100vh; } }
+  {%- elsif section.settings.image_height == 'custom' -%}
+    @media screen and (min-width: 750px) { .slideshow { height: {{ section.settings.custom_height }}px; } }
+  {%- endif -%}
 
   @media (max-width: 749px) {
-    {%- case section.settings.image_height -%}
-      {%- when 'small' -%}
-        .slideshow { height: 200px; }
-      {%- when 'medium' -%}
-        .slideshow { height: 300px; }
-      {%- when 'large' -%}
-        .slideshow { height: 400px; }
-      {%- when 'fullscreen' -%}
-        .slideshow { height: 100vh; }
-      {%- when 'adapt' -%}
-        .slideshow { height: auto; aspect-ratio: 4/3; }
-      {%- when 'custom' -%}
-        .slideshow { height: {{ section.settings.custom_height_mobile }}px; }
-      {%- else -%}
-        .slideshow { height: auto; aspect-ratio: 4/3; }
-    {%- endcase -%}
+    .slideshow { height: 400px; }
+    {%- if section.settings.image_height == 'small' -%}
+      .slideshow { height: 200px; }
+    {%- elsif section.settings.image_height == 'medium' -%}
+      .slideshow { height: 300px; }
+    {%- elsif section.settings.image_height == 'large' -%}
+      .slideshow { height: 400px; }
+    {%- elsif section.settings.image_height == 'fullscreen' -%}
+      .slideshow { height: 100vh; }
+    {%- elsif section.settings.image_height == 'custom' -%}
+      .slideshow { height: {{ section.settings.custom_height_mobile }}px; }
+    {%- endif -%}
   }
 
   .slideshow__slide {
@@ -175,7 +168,7 @@
     {%- for block in section.blocks -%}
       <div class="slideshow__slide" data-index="{{ forloop.index0 }}">
         
-        {%- if block.settings.video != blank -%}
+        {%- if block.settings.video_url != blank -%}
           <!-- Video Slide -->
           <div class="slideshow__video-wrapper">
             <video 
@@ -184,9 +177,8 @@
               muted 
               loop 
               playsinline
-              {% if forloop.first %}playsinline{% endif %}
             >
-              <source src="{{ block.settings.video | asset_url }}" type="video/mp4">
+              <source src="{{ block.settings.video_url }}" type="video/mp4">
             </video>
           </div>
         
@@ -458,9 +450,10 @@
           "label": "Mobile Image"
         },
         {
-          "type": "video",
-          "id": "video",
-          "label": "Video (MP4)"
+          "type": "text",
+          "id": "video_url",
+          "label": "Video URL (MP4)",
+          "info": "Upload video to Shopify Files, then paste the URL here"
         },
         {
           "type": "header",
