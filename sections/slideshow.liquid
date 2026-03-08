@@ -76,8 +76,9 @@
   .slideshow__controls {
     position: absolute !important;
     bottom: 30px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    right: 30px !important;
+    left: auto !important;
+    transform: none !important;
     z-index: 10;
     background: rgba(0, 0, 0, 0.4) !important;
     backdrop-filter: blur(10px);
@@ -156,6 +157,9 @@
   @media screen and (max-width: 749px) {
     .slideshow__controls {
       bottom: 15px !important;
+      right: 15px !important;
+      left: auto !important;
+      transform: none !important;
       padding: 8px 16px !important;
       gap: 10px !important;
     }
