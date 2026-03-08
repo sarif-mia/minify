@@ -8,7 +8,7 @@
       #Slider-{{ section.id }}::before,
       #Slider-{{ section.id }} .media::before,
       #Slider-{{ section.id }}:not(.banner--mobile-bottom) .banner__content::before {
-        padding-bottom: {{ 1 | divided_by: section.blocks.first.settings.image.aspect_ratio | times: 100 }}%;
+        padding-bottom: {% if section.blocks.first.settings.mobile_image != blank %}{{ 1 | divided_by: section.blocks.first.settings.mobile_image.aspect_ratio | times: 100 }}{% else %}{{ 1 | divided_by: section.blocks.first.settings.image.aspect_ratio | times: 100 }}{% endif %}%;
         content: '';
         display: block;
       }
@@ -111,8 +111,14 @@
           opacity: {{ block.settings.image_overlay_opacity | divided_by: 100.0 }};
         }
       </style>
+      
+      {%- assign slide_link = block.settings.link -%}
+      {%- if slide_link != blank -%}
+      <a href="{{ slide_link }}" class="slideshow__slide-link" aria-label="{{ block.settings.heading | escape }}"></a>
+      {%- endif -%}
+      
       <div
-        class="slideshow__slide grid__item grid--1-col slider__slide"
+        class="slideshow__slide grid__item grid--1-col slider__slide{% if slide_link != blank %} slideshow__slide--clickable{% endif %}"
         id="Slide-{{ section.id }}-{{ forloop.index }}"
         {{ block.shopify_attributes }}
         role="group"
@@ -136,18 +142,44 @@
                 assign fetch_priority = 'high'
               endif
             -%}
-            {%- if forloop.first %}
-              {{
-                block.settings.image
-                | image_url: width: 3840
-                | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority
-              }}
+            {%- if block.settings.mobile_image != blank -%}
+              <picture>
+                <source
+                  media="(max-width: 749px)"
+                  srcset="{{ block.settings.mobile_image | image_url: width: 750 }}"
+                >
+                <source
+                  media="(min-width: 750px)"
+                  srcset="{{ block.settings.image | image_url: width: 3840 }}"
+                >
+                {%- if forloop.first %}
+                  {{
+                    block.settings.image
+                    | image_url: width: 3840
+                    | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority
+                  }}
+                {%- else -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 3840
+                    | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
+                  }}
+                {%- endif -%}
+              </picture>
             {%- else -%}
-              {{
-                block.settings.image
-                | image_url: width: 3840
-                | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
-              }}
+              {%- if forloop.first %}
+                {{
+                  block.settings.image
+                  | image_url: width: 3840
+                  | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority
+                }}
+              {%- else -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 3840
+                  | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
+                }}
+              {%- endif -%}
             {%- endif -%}
           {%- else -%}
             {%- assign placeholder_slide = forloop.index | modulo: 2 -%}
@@ -257,13 +289,56 @@
   {%- endif -%}
 </slideshow-component>
 
+<style>
+  .slideshow__slide {
+    position: relative;
+  }
+  
+  .slideshow__slide--clickable {
+    cursor: pointer;
+  }
+  
+  .slideshow__slide-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    cursor: pointer;
+  }
+  
+  .slideshow__slide-link:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: -2px;
+  }
+  
+  .slideshow__text-wrapper {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .slideshow__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .slideshow__slide .banner__box {
+    position: relative;
+    z-index: 2;
+  }
+</style>
+
 {%- if request.design_mode -%}
   <script src="{{ 'theme-editor.js' | asset_url }}" defer="defer"></script>
 {%- endif -%}
 
 {% schema %}
 {
-  "name": "t:sections.slideshow.name",
+  "name": "Slideshow",
   "tag": "section",
   "class": "section",
   "disabled_on": {
@@ -276,15 +351,15 @@
       "options": [
         {
           "value": "full_bleed",
-          "label": "t:sections.slideshow.settings.layout.options__1.label"
+          "label": "Full Bleed"
         },
         {
           "value": "grid",
-          "label": "t:sections.slideshow.settings.layout.options__2.label"
+          "label": "Grid"
         }
       ],
       "default": "full_bleed",
-      "label": "t:sections.slideshow.settings.layout.label"
+      "label": "Layout"
     },
     {
       "type": "select",
@@ -292,23 +367,23 @@
       "options": [
         {
           "value": "adapt_image",
-          "label": "t:sections.slideshow.settings.slide_height.options__1.label"
+          "label": "Adapt to image"
         },
         {
           "value": "small",
-          "label": "t:sections.slideshow.settings.slide_height.options__2.label"
+          "label": "Small"
         },
         {
           "value": "medium",
-          "label": "t:sections.slideshow.settings.slide_height.options__3.label"
+          "label": "Medium"
         },
         {
           "value": "large",
-          "label": "t:sections.slideshow.settings.slide_height.options__4.label"
+          "label": "Large"
         }
       ],
       "default": "medium",
-      "label": "t:sections.slideshow.settings.slide_height.label"
+      "label": "Slide height"
     },
     {
       "type": "select",
@@ -316,34 +391,34 @@
       "options": [
         {
           "value": "dots",
-          "label": "t:sections.slideshow.settings.slider_visual.options__2.label"
+          "label": "Dots"
         },
         {
           "value": "counter",
-          "label": "t:sections.slideshow.settings.slider_visual.options__1.label"
+          "label": "Counter"
         },
         {
           "value": "numbers",
-          "label": "t:sections.slideshow.settings.slider_visual.options__3.label"
+          "label": "Numbers"
         }
       ],
-      "default": "counter",
-      "label": "t:sections.slideshow.settings.slider_visual.label"
+      "default": "dots",
+      "label": "Slider style"
     },
     {
       "type": "checkbox",
       "id": "auto_rotate",
-      "label": "t:sections.slideshow.settings.auto_rotate.label",
-      "default": false
+      "label": "Auto-rotate slides",
+      "default": true
     },
     {
       "type": "range",
       "id": "change_slides_speed",
       "min": 3,
       "max": 9,
-      "step": 2,
+      "step": 1,
       "unit": "s",
-      "label": "t:sections.slideshow.settings.change_slides_speed.label",
+      "label": "Change slides every",
       "default": 5
     },
     {
@@ -352,48 +427,52 @@
       "options": [
         {
           "value": "none",
-          "label": "t:sections.all.animation.image_behavior.options__1.label"
+          "label": "None"
         },
         {
           "value": "ambient",
-          "label": "t:sections.all.animation.image_behavior.options__2.label"
+          "label": "Ambient"
         }
       ],
       "default": "none",
-      "label": "t:sections.all.animation.image_behavior.label"
+      "label": "Image animation"
     },
     {
       "type": "header",
-      "content": "t:sections.slideshow.settings.mobile.content"
+      "content": "Mobile"
     },
     {
       "type": "checkbox",
       "id": "show_text_below",
-      "label": "t:sections.slideshow.settings.show_text_below.label",
+      "label": "Show text below image on mobile",
       "default": true
     },
     {
       "type": "header",
-      "content": "t:sections.slideshow.settings.accessibility.content"
+      "content": "Accessibility"
     },
     {
       "type": "text",
       "id": "accessibility_info",
-      "label": "t:sections.slideshow.settings.accessibility.label",
-      "info": "t:sections.slideshow.settings.accessibility.info",
-      "default": "t:sections.slideshow.settings.accessibility.default"
+      "label": "Accessibility label",
+      "default": "Slideshow"
     }
   ],
   "blocks": [
     {
       "type": "slide",
-      "name": "t:sections.slideshow.blocks.slide.name",
+      "name": "Slide",
       "limit": 5,
       "settings": [
         {
           "type": "image_picker",
           "id": "image",
-          "label": "t:sections.slideshow.blocks.slide.settings.image.label"
+          "label": "Desktop Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile Image (optional)"
         },
         {
           "type": "range",
@@ -402,18 +481,18 @@
           "max": 100,
           "step": 10,
           "unit": "%",
-          "label": "t:sections.slideshow.blocks.slide.settings.image_overlay_opacity.label",
+          "label": "Image overlay opacity",
           "default": 0
         },
         {
           "type": "header",
-          "content": "t:sections.slideshow.blocks.slide.settings.header_text.content"
+          "content": "Text"
         },
         {
           "type": "inline_richtext",
           "id": "heading",
-          "default": "t:sections.slideshow.blocks.slide.settings.heading.default",
-          "label": "t:sections.slideshow.blocks.slide.settings.heading.label"
+          "default": "Image slide",
+          "label": "Heading"
         },
         {
           "type": "select",
@@ -421,64 +500,59 @@
           "options": [
             {
               "value": "h2",
-              "label": "t:sections.all.heading_size.options__1.label"
+              "label": "Small"
             },
             {
               "value": "h1",
-              "label": "t:sections.all.heading_size.options__2.label"
+              "label": "Medium"
             },
             {
               "value": "h0",
-              "label": "t:sections.all.heading_size.options__3.label"
+              "label": "Large"
             },
             {
               "value": "hxl",
-              "label": "t:sections.all.heading_size.options__4.label"
-            },
-            {
-              "value": "hxxl",
-              "label": "t:sections.all.heading_size.options__5.label"
+              "label": "Extra Large"
             }
           ],
           "default": "h1",
-          "label": "t:sections.all.heading_size.label"
+          "label": "Heading size"
         },
         {
           "type": "inline_richtext",
           "id": "subheading",
-          "default": "t:sections.slideshow.blocks.slide.settings.subheading.default",
-          "label": "t:sections.slideshow.blocks.slide.settings.subheading.label"
+          "default": "Tell your brand story through images",
+          "label": "Subheading"
         },
         {
           "type": "header",
-          "content": "t:sections.slideshow.blocks.slide.settings.header_button.content"
+          "content": "Button"
         },        
         {
           "type": "text",
           "id": "button_label",
-          "default": "t:sections.slideshow.blocks.slide.settings.button_label.default",
-          "label": "t:sections.slideshow.blocks.slide.settings.button_label.label", 
-          "info": "t:sections.slideshow.blocks.slide.settings.button_label.info"
+          "default": "Shop Now",
+          "label": "Button label"
         },
         {
           "type": "url",
           "id": "link",
-          "label": "t:sections.slideshow.blocks.slide.settings.link.label"
+          "label": "Slide link (entire slide clickable)"
         },
         {
           "type": "checkbox",
           "id": "button_style_secondary",
-          "label": "t:sections.slideshow.blocks.slide.settings.secondary_style.label",
+          "label": "Use outline button style",
           "default": false
         },
         {
           "type": "header",
-          "content": "t:sections.slideshow.blocks.slide.settings.header_layout.content"
+          "content": "Layout"
         },         
         {
           "type": "checkbox",
           "id": "show_text_box",
-          "label": "t:sections.slideshow.blocks.slide.settings.show_text_box.label",
+          "label": "Show text box",
           "default": true
         },
         {
@@ -487,43 +561,43 @@
           "options": [
             {
               "value": "top-left",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__1.label"
+              "label": "Top left"
             },
             {
               "value": "top-center",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__2.label"
+              "label": "Top center"
             },
             {
               "value": "top-right",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__3.label"
+              "label": "Top right"
             },
             {
               "value": "middle-left",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__4.label"
+              "label": "Middle left"
             },
             {
               "value": "middle-center",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__5.label"
+              "label": "Middle center"
             },
             {
               "value": "middle-right",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__6.label"
+              "label": "Middle right"
             },
             {
               "value": "bottom-left",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__7.label"
+              "label": "Bottom left"
             },
             {
               "value": "bottom-center",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__8.label"
+              "label": "Bottom center"
             },
             {
               "value": "bottom-right",
-              "label": "t:sections.slideshow.blocks.slide.settings.box_align.options__9.label"
+              "label": "Bottom right"
             }
           ],
           "default": "middle-center",
-          "label": "t:sections.slideshow.blocks.slide.settings.box_align.label"
+          "label": "Text box position"
         },
         {
           "type": "select",
@@ -531,19 +605,19 @@
           "options": [
             {
               "value": "left",
-              "label": "t:sections.slideshow.blocks.slide.settings.text_alignment.option_1.label"
+              "label": "Left"
             },
             {
               "value": "center",
-              "label": "t:sections.slideshow.blocks.slide.settings.text_alignment.option_2.label"
+              "label": "Center"
             },
             {
               "value": "right",
-              "label": "t:sections.slideshow.blocks.slide.settings.text_alignment.option_3.label"
+              "label": "Right"
             }
           ],
           "default": "center",
-          "label": "t:sections.slideshow.blocks.slide.settings.text_alignment.label"
+          "label": "Text alignment"
         },
         {
           "type": "select",
@@ -551,24 +625,24 @@
           "options": [
             {
               "value": "left",
-              "label": "t:sections.slideshow.blocks.slide.settings.text_alignment_mobile.options__1.label"
+              "label": "Left"
             },
             {
               "value": "center",
-              "label": "t:sections.slideshow.blocks.slide.settings.text_alignment_mobile.options__2.label"
+              "label": "Center"
             },
             {
               "value": "right",
-              "label": "t:sections.slideshow.blocks.slide.settings.text_alignment_mobile.options__3.label"
+              "label": "Right"
             }
           ],
           "default": "center",
-          "label": "t:sections.slideshow.blocks.slide.settings.text_alignment_mobile.label"
+          "label": "Mobile text alignment"
         },        
         {
           "type": "color_scheme",
           "id": "color_scheme",
-          "label": "t:sections.all.colors.label",
+          "label": "Color scheme",
           "default": "scheme-1"
         }
       ]
@@ -576,7 +650,7 @@
   ],
   "presets": [
     {
-      "name": "t:sections.slideshow.presets.name",
+      "name": "Slideshow",
       "blocks": [
         {
           "type": "slide"
