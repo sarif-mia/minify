@@ -1,449 +1,198 @@
-{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+<section class="custom-slider">
 
-<style>
-  .slideshow-section {
-    width: 100%;
-    max-width: 100vw;
-    overflow: hidden;
-    position: relative;
-  }
+<div class="slider-wrapper">
 
-  .slideshow {
-    display: flex;
-    width: 100%;
-    overflow: hidden;
-    height: 600px;
-  }
+{%- for block in section.blocks -%}
 
-  @media (max-width: 749px) {
-    .slideshow {
-      height: 400px;
-    }
-  }
+<div class="slide">
 
-  .slideshow__slide {
-    min-width: 100%;
-    height: 100%;
-    flex-shrink: 0;
-  }
+{% if block.settings.slide_link != blank %}
+<a href="{{ block.settings.slide_link }}">
+{% endif %}
 
-  .slideshow__slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+<picture>
 
-  .slideshow__image--mobile {
-    display: none;
-  }
+{% if block.settings.mobile_image != blank %}
+<source media="(max-width:749px)" srcset="{{ block.settings.mobile_image | image_url: width: 750 }}">
+{% endif %}
 
-  @media (max-width: 749px) {
-    .slideshow__image--desktop {
-      display: none;
-    }
-    .slideshow__image--mobile {
-      display: block;
-    }
-  }
+<img
+src="{{ block.settings.image | image_url: width: 2000 }}"
+alt=""
+loading="lazy"
+>
 
-  .slideshow__link {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
+</picture>
 
-  .slideshow__video-wrapper {
-    width: 100%;
-    height: 100%;
-  }
+{% if block.settings.slide_link != blank %}
+</a>
+{% endif %}
 
-  .slideshow__video-wrapper video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .slideshow__nav {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    z-index: 10;
-  }
-
-  .slideshow__dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    border: 2px solid #fff;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0;
-  }
-
-  .slideshow__dot:hover {
-    background: rgba(255, 255, 255, 0.8);
-  }
-
-  .slideshow__dot.active {
-    background: #fff;
-    transform: scale(1.2);
-  }
-
-  .slideshow__arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s ease;
-  }
-
-  .slideshow__arrow:hover {
-    background: rgba(255, 255, 255, 0.4);
-  }
-
-  .slideshow__arrow svg {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: #fff;
-    stroke-width: 2;
-  }
-
-  .slideshow__arrow--prev {
-    left: 20px;
-  }
-
-  .slideshow__arrow--next {
-    right: 20px;
-  }
-</style>
-
-<div class="slideshow-section">
-  <div class="slideshow" id="Slideshow-{{ section.id }}">
-    {%- for block in section.blocks -%}
-      <div class="slideshow__slide" data-index="{{ forloop.index0 }}">
-        
-        {%- if block.settings.video_url != blank -%}
-          <!-- Video Slide -->
-          <div class="slideshow__video-wrapper">
-            <video 
-              class="slideshow__video"
-              autoplay 
-              muted 
-              loop 
-              playsinline
-            >
-              <source src="{{ block.settings.video_url }}" type="video/mp4">
-            </video>
-          </div>
-        
-        {%- elsif block.settings.image != blank -%}
-          <!-- Image Slide -->
-          {%- assign desktop_image = block.settings.image -%}
-          {%- assign mobile_image = block.settings.mobile_image -%}
-          {%- assign slide_link = block.settings.link -%}
-          
-          {%- if slide_link != blank -%}
-            <a href="{{ slide_link }}" class="slideshow__link">
-          {%- endif -%}
-          
-          {%- if mobile_image != blank -%}
-            <img 
-              src="{{ mobile_image | image_url: width: 800 }}" 
-              alt="{{ mobile_image.alt | escape }}"
-              class="slideshow__image slideshow__image--mobile"
-              {% if forloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
-            >
-            <img 
-              src="{{ desktop_image | image_url: width: 1920 }}" 
-              alt="{{ desktop_image.alt | escape }}"
-              class="slideshow__image slideshow__image--desktop"
-              {% if forloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
-            >
-          {%- else -%}
-            <img 
-              src="{{ desktop_image | image_url: width: 1920 }}" 
-              alt="{{ desktop_image.alt | escape }}"
-              class="slideshow__image"
-              {% if forloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
-            >
-          {%- endif -%}
-          
-          {%- if slide_link != blank -%}
-            </a>
-          {%- endif -%}
-        
-        {%- else -%}
-          <div style="width:100%;height:100%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;">
-            <span>Add Image or Video {{ forloop.index }}</span>
-          </div>
-        {%- endif -%}
-      </div>
-    {%- endfor -%}
-  </div>
-
-  {%- if section.blocks.size > 1 -%}
-    <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous slide" type="button">
-      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </button>
-    <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next slide" type="button">
-      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
-    </button>
-
-    <div class="slideshow__nav">
-      {%- for block in section.blocks -%}
-        <button 
-          class="slideshow__dot{% if forloop.first %} active{% endif %}" 
-          data-index="{{ forloop.index0 }}"
-          aria-label="Go to slide {{ forloop.index }}"
-          type="button"
-        ></button>
-      {%- endfor -%}
-    </div>
-  {%- endif -%}
 </div>
 
+{%- endfor -%}
+
+<button class="prev">&#10094;</button>
+<button class="next">&#10095;</button>
+
+<div class="dots"></div>
+
+</div>
+
+</section>
+
+
+<style>
+
+.custom-slider{
+position:relative;
+width:100%;
+overflow:hidden;
+}
+
+.slider-wrapper{
+position:relative;
+}
+
+.slide{
+display:none;
+}
+
+.slide img{
+width:100%;
+height:auto;
+display:block;
+}
+
+.prev,
+.next{
+position:absolute;
+top:50%;
+transform:translateY(-50%);
+background:rgba(0,0,0,0.5);
+color:white;
+border:none;
+padding:12px 18px;
+cursor:pointer;
+font-size:22px;
+z-index:10;
+}
+
+.prev{
+left:10px;
+}
+
+.next{
+right:10px;
+}
+
+.dots{
+text-align:center;
+position:absolute;
+bottom:15px;
+width:100%;
+}
+
+.dots span{
+height:12px;
+width:12px;
+margin:0 4px;
+background:#bbb;
+border-radius:50%;
+display:inline-block;
+cursor:pointer;
+}
+
+.dots .active{
+background:#000;
+}
+
+</style>
+
+
 <script>
-  (function() {
-    const wrapper = document.getElementById('Slideshow-{{ section.id }}').parentElement;
-    if (!wrapper) return;
-    
-    const slideshow = wrapper.querySelector('.slideshow');
-    const slides = slideshow.querySelectorAll('.slideshow__slide');
-    const dots = wrapper.querySelectorAll('.slideshow__dot');
-    const prevBtn = wrapper.querySelector('.slideshow__arrow--prev');
-    const nextBtn = wrapper.querySelector('.slideshow__arrow--next');
-    
-    if (slides.length === 0) return;
-    
-    let currentIndex = 0;
-    const totalSlides = slides.length;
-    const autoRotate = {{ section.settings.auto_rotate | default: true | json }};
-    const speed = {{ section.settings.change_slides_speed | default: 5 }} * 1000;
-    let autoplayInterval;
 
-    // Set initial position
-    slideshow.style.transition = 'transform 0.5s ease-in-out';
-    slideshow.style.transform = 'translateX(0)';
+let slideIndex = 0;
+const slides = document.querySelectorAll('.slide');
+const dotsContainer = document.querySelector('.dots');
 
-    function goToSlide(index) {
-      currentIndex = index;
-      if (currentIndex >= totalSlides) currentIndex = 0;
-      if (currentIndex < 0) currentIndex = totalSlides - 1;
-      
-      slideshow.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
-      
-      dots.forEach(function(dot, i) {
-        dot.classList.toggle('active', i === currentIndex);
-      });
-    }
+slides.forEach((slide, index)=>{
+let dot = document.createElement("span");
+dot.addEventListener("click", ()=>showSlide(index));
+dotsContainer.appendChild(dot);
+});
 
-    function nextSlide() {
-      goToSlide(currentIndex + 1);
-    }
+const dots = dotsContainer.querySelectorAll("span");
 
-    function startAutoplay() {
-      if (autoRotate && totalSlides > 1) {
-        autoplayInterval = setInterval(nextSlide, speed);
-      }
-    }
+function showSlide(n){
 
-    function stopAutoplay() {
-      clearInterval(autoplayInterval);
-    }
+slides.forEach(s=>s.style.display="none");
+dots.forEach(d=>d.classList.remove("active"));
 
-    // Arrow navigation
-    if (prevBtn) {
-      prevBtn.addEventListener('click', function() {
-        stopAutoplay();
-        goToSlide(currentIndex - 1);
-        startAutoplay();
-      });
-    }
-    
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function() {
-        stopAutoplay();
-        goToSlide(currentIndex + 1);
-        startAutoplay();
-      });
-    }
+slideIndex=n;
 
-    // Dot navigation
-    dots.forEach(function(dot, index) {
-      dot.addEventListener('click', function() {
-        stopAutoplay();
-        goToSlide(index);
-        startAutoplay();
-      });
-    });
+slides[slideIndex].style.display="block";
+dots[slideIndex].classList.add("active");
 
-    // Touch/swipe support
-    let touchStartX = 0;
-    
-    slideshow.addEventListener('touchstart', function(e) {
-      touchStartX = e.touches[0].clientX;
-    }, {passive: true});
-    
-    slideshow.addEventListener('touchend', function(e) {
-      const touchEndX = e.changedTouches[0].clientX;
-      const diff = touchStartX - touchEndX;
-      
-      if (Math.abs(diff) > 50) {
-        stopAutoplay();
-        if (diff > 0) {
-          goToSlide(currentIndex + 1);
-        } else {
-          goToSlide(currentIndex - 1);
-        }
-        startAutoplay();
-      }
-    }, {passive: true});
+}
 
-    // Start autoplay
-    startAutoplay();
-  })();
+function nextSlide(){
+slideIndex++;
+if(slideIndex>=slides.length){
+slideIndex=0;
+}
+showSlide(slideIndex);
+}
+
+function prevSlide(){
+slideIndex--;
+if(slideIndex<0){
+slideIndex=slides.length-1;
+}
+showSlide(slideIndex);
+}
+
+document.querySelector(".next").onclick=nextSlide;
+document.querySelector(".prev").onclick=prevSlide;
+
+showSlide(slideIndex);
+
+setInterval(nextSlide,5000);
+
 </script>
+
 
 {% schema %}
 {
-  "name": "Basic Slideshow",
-  "tag": "section",
-  "class": "section",
-  "disabled_on": {
-    "groups": ["header", "footer"]
-  },
-  "settings": [
-    {
-      "type": "select",
-      "id": "image_height",
-      "options": [
-        {
-          "value": "adapt",
-          "label": "Adapt to image"
-        },
-        {
-          "value": "small",
-          "label": "Small (300px)"
-        },
-        {
-          "value": "medium",
-          "label": "Medium (500px)"
-        },
-        {
-          "value": "large",
-          "label": "Large (700px)"
-        },
-        {
-          "value": "fullscreen",
-          "label": "Fullscreen"
-        },
-        {
-          "value": "custom",
-          "label": "Custom height"
-        }
-      ],
-      "default": "adapt",
-      "label": "Slider height"
-    },
-    {
-      "type": "range",
-      "id": "custom_height",
-      "min": 200,
-      "max": 1000,
-      "step": 50,
-      "unit": "px",
-      "label": "Custom height (desktop)",
-      "default": 600,
-      "info": "Only works when 'Custom height' is selected"
-    },
-    {
-      "type": "range",
-      "id": "custom_height_mobile",
-      "min": 150,
-      "max": 600,
-      "step": 50,
-      "unit": "px",
-      "label": "Custom height (mobile)",
-      "default": 400,
-      "info": "Only works when 'Custom height' is selected"
-    },
-    {
-      "type": "checkbox",
-      "id": "auto_rotate",
-      "label": "Auto-rotate slides",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "change_slides_speed",
-      "min": 3,
-      "max": 8,
-      "step": 1,
-      "unit": "s",
-      "label": "Change slides every",
-      "default": 5
-    }
-  ],
-  "blocks": [
-    {
-      "type": "slide",
-      "name": "Slide",
-      "limit": 5,
-      "settings": [
-        {
-          "type": "header",
-          "content": "Media"
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Desktop Image"
-        },
-        {
-          "type": "image_picker",
-          "id": "mobile_image",
-          "label": "Mobile Image"
-        },
-        {
-          "type": "text",
-          "id": "video_url",
-          "label": "Video URL (MP4)",
-          "info": "Upload video to Shopify Files, then paste the URL here"
-        },
-        {
-          "type": "header",
-          "content": "Link"
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Image Link"
-        }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "Basic Slideshow",
-      "blocks": [
-        { "type": "slide" },
-        { "type": "slide" }
-      ]
-    }
-  ]
+"name":"Custom Slider",
+"settings":[],
+"blocks":[
+{
+"type":"slide",
+"name":"Slide",
+"settings":[
+{
+"type":"image_picker",
+"id":"image",
+"label":"Desktop Image"
+},
+{
+"type":"image_picker",
+"id":"mobile_image",
+"label":"Mobile Image"
+},
+{
+"type":"url",
+"id":"slide_link",
+"label":"Slide Link"
+}
+]
+}
+],
+"presets":[
+{
+"name":"Custom Slider"
+}
+]
 }
 {% endschema %}
