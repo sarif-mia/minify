@@ -1,268 +1,253 @@
-{{ 'component-slider.css' | asset_url | stylesheet_tag }}
-
-{%- style -%}
-  .section-{{ section.id }}-padding {
-    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
-  }
-
-  @media screen and (min-width: 750px) {
-    .section-{{ section.id }}-padding {
-      padding-top: {{ section.settings.padding_top }}px;
-      padding-bottom: {{ section.settings.padding_bottom }}px;
-    }
-  }
-{%- endstyle -%}
-
-<script src="{{ 'slider.js' | asset_url }}" defer="defer"></script>
-
-<section class="slideshow-section section-{{ section.id }}-padding">
-  <div class="slideshow page-width" id="Slideshow-{{ section.id }}">
+<section class="slider-section">
+  <div class="slider-container" id="slider-{{ section.id }}">
+    
     {%- for block in section.blocks -%}
-      <div class="slideshow__slide" {{ block.shopify_attributes }} data-index="{{ forloop.index0 }}">
-        {%- if block.settings.image != blank -%}
-          {%- assign height = block.settings.image.width | divided_by: block.settings.image.aspect_ratio | round -%}
-          {{ block.settings.image | image_url: width: 3840 | image_tag:
-            loading: 'lazy',
-            height: height,
-            class: 'slideshow__image',
-            sizes: '100vw',
-            widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
-          }}
-        {%- else -%}
-          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg slideshow__image' }}
-        {%- endif -%}
-
-        <div class="slideshow__text-wrapper">
-          {%- if block.settings.heading != blank -%}
-            <h2 class="slideshow__heading">{{ block.settings.heading | escape }}</h2>
-          {%- endif -%}
-          {%- if block.settings.subheading != blank -%}
-            <p class="slideshow__subheading">{{ block.settings.subheading | escape }}</p>
-          {%- endif -%}
-          {%- if block.settings.button_label != blank -%}
-            <a href="{{ block.settings.link }}" class="slideshow__button button">{{ block.settings.button_label | escape }}</a>
-          {%- endif -%}
-        </div>
+    <div class="slide-item" data-slide="{{ forloop.index0 }}">
+      
+      {% if block.settings.link != blank %}
+      <a href="{{ block.settings.link }}">
+      {% endif %}
+      
+      {% if block.settings.image != blank %}
+      <img src="{{ block.settings.image | image_url: width: 1920 }}" alt="" class="desktop-img">
+      {% endif %}
+      
+      {% if block.settings.mobile_image != blank %}
+      <img src="{{ block.settings.mobile_image | image_url: width: 750 }}" alt="" class="mobile-img">
+      {% endif %}
+      
+      {% if block.settings.image == blank and block.settings.mobile_image == blank %}
+      <div class="placeholder-img">
+        {{ 'image' | placeholder_svg_tag: 'placeholder' }}
       </div>
+      {% endif %}
+      
+      {% if block.settings.link != blank %}
+      </a>
+      {% endif %}
+      
+      {% if block.settings.title != blank or block.settings.text != blank %}
+      <div class="slide-content">
+        {% if block.settings.title != blank %}
+        <h2>{{ block.settings.title }}</h2>
+        {% endif %}
+        {% if block.settings.text != blank %}
+        <p>{{ block.settings.text }}</p>
+        {% endif %}
+        {% if block.settings.btn_text != blank %}
+        <a href="{{ block.settings.link }}" class="btn">{{ block.settings.btn_text }}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+      
+    </div>
+    {%- endfor -%}
+    
+  </div>
+  
+  <button class="arrow-prev">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </button>
+  <button class="arrow-next">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </button>
+  
+  <div class="slider-dots">
+    {%- for block in section.blocks -%}
+    <span class="dot" data-slide="{{ forloop.index0 }}"></span>
     {%- endfor -%}
   </div>
-
-  <div class="slideshow__controls">
-    <button class="slideshow__arrow slideshow__arrow--prev" name="previous" aria-label="Previous slide" type="button">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </button>
-    
-    {%- if section.blocks.size > 1 -%}
-      <div class="slideshow__dots">
-        {%- for block in section.blocks -%}
-          <button class="slideshow__dot{% if forloop.first %} active{% endif %}" data-index="{{ forloop.index0 }}" aria-label="Go to slide {{ forloop.index }}" type="button"></button>
-        {%- endfor -%}
-      </div>
-    {%- endif -%}
-
-    <button class="slideshow__arrow slideshow__arrow--next" name="next" aria-label="Next slide" type="button">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-    </button>
-  </div>
+  
 </section>
 
-{%- style -%}
-  .slideshow-section {
-    position: relative;
-    overflow: hidden;
-  }
+<style>
+.slider-section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
 
-  .slideshow {
-    position: relative;
-    width: 100%;
-  }
+.slider-container {
+  position: relative;
+  width: 100%;
+}
 
-  .slideshow__slide {
+.slide-item {
+  display: none;
+  width: 100%;
+}
+
+.slide-item:first-child {
+  display: block;
+}
+
+.slide-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mobile-img {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-img {
     display: none;
-    position: relative;
   }
-
-  .slideshow__slide:first-child {
+  .mobile-img {
     display: block;
   }
+}
 
-  .slideshow__image {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
+.slide-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  z-index: 10;
+}
 
-  .slideshow__text-wrapper {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #fff;
-    z-index: 2;
-  }
+.slide-content h2 {
+  font-size: 48px;
+  margin: 0 0 20px;
+  color: #fff;
+}
 
-  .slideshow__heading {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: inherit;
-  }
+.slide-content p {
+  font-size: 20px;
+  margin: 0 0 30px;
+  color: #fff;
+}
 
-  .slideshow__subheading {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: inherit;
-  }
+.slide-content .btn {
+  display: inline-block;
+  padding: 15px 40px;
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+  font-weight: bold;
+}
 
-  .slideshow__button {
-    background: #fff;
-    color: #000;
-    padding: 12px 24px;
-    text-decoration: none;
-    display: inline-block;
-  }
+.arrow-prev,
+.arrow-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .slideshow__controls {
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    z-index: 10;
-  }
+.arrow-prev { left: 20px; }
+.arrow-next { right: 20px; }
 
-  .slideshow__arrow {
-    background: rgba(0,0,0,0.5);
-    border: none;
-    color: #fff;
-    padding: 12px;
-    cursor: pointer;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.slider-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 20;
+}
 
-  .slideshow__dots {
-    display: flex;
-    gap: 10px;
-  }
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  border: 2px solid #fff;
+  cursor: pointer;
+}
 
-  .slideshow__dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.5);
-    border: 2px solid #fff;
-    cursor: pointer;
-    padding: 0;
-  }
+.dot.active {
+  background: #fff;
+}
 
-  .slideshow__dot.active {
-    background: #fff;
-  }
-{%- endstyle -%}
+.placeholder-img {
+  background: #f0f0f0;
+  height: 500px;
+}
+</style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const slider = document.getElementById('Slideshow-{{ section.id }}');
-    if (!slider) return;
-    
-    const slides = slider.querySelectorAll('.slideshow__slide');
-    const dots = slider.parentElement.querySelectorAll('.slideshow__dot');
-    const prevBtn = slider.parentElement.querySelector('.slideshow__arrow--prev');
-    const nextBtn = slider.parentElement.querySelector('.slideshow__arrow--next');
-    
-    let currentIndex = 0;
-    const totalSlides = slides.length;
-    let autoPlayInterval;
+(function(){
+  var section = document.querySelector('.slider-section');
+  var slides = section.querySelectorAll('.slide-item');
+  var dots = section.querySelectorAll('.dot');
+  var prev = section.querySelector('.arrow-prev');
+  var next = section.querySelector('.arrow-next');
+  var count = slides.length;
+  var current = 0;
+  var timer;
 
-    function goToSlide(index) {
-      slides.forEach(s => s.style.display = 'none');
-      dots.forEach(d => d.classList.remove('active'));
-      
-      slides[index].style.display = 'block';
-      dots[index].classList.add('active');
-      currentIndex = index;
-    }
+  if(count === 0) return;
 
-    function nextSlide() {
-      const next = (currentIndex + 1) % totalSlides;
-      goToSlide(next);
-    }
+  function show(index) {
+    slides.forEach(function(s){ s.style.display = 'none'; });
+    dots.forEach(function(d){ d.classList.remove('active'); });
+    slides[index].style.display = 'block';
+    dots[index].classList.add('active');
+    current = index;
+  }
 
-    function prevSlide() {
-      const prev = (currentIndex - 1 + totalSlides) % totalSlides;
-      goToSlide(prev);
-    }
+  function goNext() {
+    show((current + 1) % count);
+  }
 
-    if (prevBtn) prevBtn.addEventListener('click', function() {
-      clearInterval(autoPlayInterval);
-      prevSlide();
-      startAutoPlay();
-    });
+  function goPrev() {
+    show((current - 1 + count) % count);
+  }
 
-    if (nextBtn) nextBtn.addEventListener('click', function() {
-      clearInterval(autoPlayInterval);
-      nextSlide();
-      startAutoPlay();
-    });
-
-    dots.forEach((dot, index) => {
-      dot.addEventListener('click', function() {
-        clearInterval(autoPlayInterval);
-        goToSlide(index);
-        startAutoPlay();
-      });
-    });
-
-    function startAutoPlay() {
-      autoPlayInterval = setInterval(nextSlide, 5000);
-    }
-
-    if (totalSlides > 1) {
-      goToSlide(0);
-      startAutoPlay();
-    }
+  next.addEventListener('click', function(){
+    goNext();
+    resetTimer();
   });
+
+  prev.addEventListener('click', function(){
+    goPrev();
+    resetTimer();
+  });
+
+  dots.forEach(function(dot, i){
+    dot.addEventListener('click', function(){
+      show(i);
+      resetTimer();
+    });
+  });
+
+  function resetTimer() {
+    clearInterval(timer);
+    timer = setInterval(goNext, 5000);
+  }
+
+  show(0);
+  timer = setInterval(goNext, 5000);
+})();
 </script>
 
 {% schema %}
 {
-  "name": "Slideshow",
+  "name": "Image Slider",
   "tag": "section",
   "class": "section",
-  "settings": [
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0,
-      "max": 100,
-      "step": 4,
-      "unit": "px",
-      "label": "t:sections.all.padding.padding_top",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0,
-      "max": 100,
-      "step": 4,
-      "unit": "px",
-      "label": "t:sections.all.padding.padding_bottom",
-      "default": 0
-    }
-  ],
+  "settings": [],
   "blocks": [
     {
       "type": "slide",
       "name": "Slide",
-      "limit": 5,
       "settings": [
         {
           "type": "image_picker",
@@ -276,18 +261,18 @@
         },
         {
           "type": "text",
-          "id": "heading",
-          "label": "Heading"
+          "id": "title",
+          "label": "Title"
         },
         {
           "type": "text",
-          "id": "subheading",
-          "label": "Subheading"
+          "id": "text",
+          "label": "Text"
         },
         {
           "type": "text",
-          "id": "button_label",
-          "label": "Button Label"
+          "id": "btn_text",
+          "label": "Button Text"
         },
         {
           "type": "url",
@@ -299,7 +284,7 @@
   ],
   "presets": [
     {
-      "name": "Slideshow",
+      "name": "Image Slider",
       "blocks": [
         { "type": "slide" },
         { "type": "slide" }
