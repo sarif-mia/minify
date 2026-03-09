@@ -1,146 +1,99 @@
-<section class="pro-slider">
-
-<div class="slides">
+<section class="slideshow">
 
 {% for block in section.blocks %}
-
-<div class="slide">
+<div class="slide" data-index="{{ forloop.index0 }}">
 
 {% if block.settings.link != blank %}
 <a href="{{ block.settings.link }}">
 {% endif %}
 
-<picture>
-
-{% if block.settings.mobile_image != blank %}
-<source media="(max-width:749px)" srcset="{{ block.settings.mobile_image | image_url: width: 750 }}">
-{% endif %}
-
 {% if block.settings.image != blank %}
-<img src="{{ block.settings.image | image_url: width: 2000 }}" alt="" loading="lazy">
+<img src="{{ block.settings.image | image_url: width: 2000 }}" alt="" {% if forloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}>
 {% endif %}
-
-</picture>
 
 {% if block.settings.link != blank %}
 </a>
 {% endif %}
 
 </div>
-
 {% endfor %}
 
 </div>
 
-<button class="slider-prev">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="15 18 9 12 15 6"></polyline>
-  </svg>
+<button class="prev-btn">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
 </button>
-<button class="slider-next">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="9 18 15 12 9 6"></polyline>
-  </svg>
+<button class="next-btn">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
 </button>
 
-<div class="slider-dots"></div>
+<div class="dots"></div>
 
 </section>
 
 
 <style>
 
-.pro-slider{
+.slideshow{
 position:relative;
 width:100%;
 overflow:hidden;
 }
 
-.slides{
-position:relative;
-width:100%;
-height:100%;
-}
-
 .slide{
 display:none;
-position:absolute;
-top:0;
-left:0;
-width:100%;
+}
+
+.slide.active{
+display:block;
 }
 
 .slide img{
 width:100%;
+height:auto;
 display:block;
 }
 
-.slide:first-child{
-display:block;
-}
-
-.slider-prev,
-.slider-next{
+.prev-btn,.next-btn{
 position:absolute;
 top:50%;
 transform:translateY(-50%);
 background:rgba(0,0,0,0.5);
 color:#fff;
 border:none;
-font-size:22px;
-padding:10px;
+padding:12px;
 cursor:pointer;
-z-index:5;
-width:44px;
-height:44px;
+z-index:10;
+border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-border-radius:50%;
-transition:background 0.3s;
 }
 
-.slider-prev:hover,
-.slider-next:hover{
-background:rgba(0,0,0,0.8);
-}
+.prev-btn{left:10px;}
+.next-btn{right:10px;}
 
-.slider-prev{
-left:10px;
-}
-
-.slider-next{
-right:10px;
-}
-
-.slider-dots{
+.dots{
 position:absolute;
-bottom:15px;
-width:100%;
+bottom:20px;
+left:0;
+right:0;
 text-align:center;
-display:flex;
-justify-content:center;
-gap:8px;
 }
 
-.slider-dots span{
-height:12px;
-width:12px;
-background:rgba(255,255,255,0.5);
+.dots span{
 display:inline-block;
+width:10px;
+height:10px;
+margin:0 5px;
+background:rgba(255,255,255,0.5);
 border-radius:50%;
 cursor:pointer;
-transition:all 0.3s;
 border:2px solid #fff;
 }
 
-.slider-dots span:hover{
-background:rgba(255,255,255,0.8);
-}
-
-.slider-dots .active{
+.dots span.active{
 background:#fff;
-transform:scale(1.2);
 }
 
 </style>
@@ -148,90 +101,62 @@ transform:scale(1.2);
 
 <script>
 
-(function(){
-  var slider = document.querySelector('.pro-slider');
-  if(!slider) return;
-  
-  var slides = slider.querySelectorAll('.slide');
-  var nextBtn = slider.querySelector('.slider-next');
-  var prevBtn = slider.querySelector('.slider-prev');
-  var dotsContainer = slider.querySelector('.slider-dots');
-  
-  if(!slides.length || !dotsContainer) return;
-  
-  var currentIndex = 0;
-  
-  // Create dots
-  slides.forEach(function(slide, i){
-    var dot = document.createElement('span');
-    dot.style.cursor = 'pointer';
-    dot.style.display = 'inline-block';
-    dot.style.width = '12px';
-    dot.style.height = '12px';
-    dot.style.margin = '0 4px';
-    dot.style.borderRadius = '50%';
-    dot.style.backgroundColor = 'rgba(255,255,255,0.5)';
-    dot.style.border = '2px solid #fff';
-    dot.style.transition = 'all 0.3s';
-    
-    dot.addEventListener('click', function(){
-      goToSlide(i);
-    });
-    
-    dotsContainer.appendChild(dot);
-  });
-  
-  var dots = dotsContainer.querySelectorAll('span');
-  
-  function goToSlide(index){
-    slides.forEach(function(s){
-      s.style.display = 'none';
-    });
-    dots.forEach(function(d){
-      d.style.backgroundColor = 'rgba(255,255,255,0.5)';
-      d.style.transform = 'scale(1)';
-    });
-    
-    slides[index].style.display = 'block';
-    dots[index].style.backgroundColor = '#fff';
-    dots[index].style.transform = 'scale(1.2)';
-    
-    currentIndex = index;
-  }
-  
-  function nextSlide(){
-    var newIndex = currentIndex + 1;
-    if(newIndex >= slides.length) newIndex = 0;
-    goToSlide(newIndex);
-  }
-  
-  function prevSlide(){
-    var newIndex = currentIndex - 1;
-    if(newIndex < 0) newIndex = slides.length - 1;
-    goToSlide(newIndex);
-  }
-  
-  nextBtn.addEventListener('click', function(){
-    nextSlide();
-  });
-  
-  prevBtn.addEventListener('click', function(){
-    prevSlide();
-  });
-  
-  // Initialize first slide
-  goToSlide(0);
-  
-  // Auto-rotate
-  setInterval(nextSlide, 5000);
-})();
+document.addEventListener('DOMContentLoaded',function(){
+
+var slides = document.querySelectorAll('.slideshow .slide');
+var dotsContainer = document.querySelector('.slideshow .dots');
+var prevBtn = document.querySelector('.slideshow .prev-btn');
+var nextBtn = document.querySelector('.slideshow .next-btn');
+var current = 0;
+
+if(slides.length === 0) return;
+
+// Create dots
+slides.forEach(function(slide,i){
+var dot = document.createElement('span');
+dot.addEventListener('click',function(){
+showSlide(i);
+});
+dotsContainer.appendChild(dot);
+});
+
+var dots = dotsContainer.querySelectorAll('span');
+
+function showSlide(index){
+slides.forEach(function(s){s.classList.remove('active');});
+dots.forEach(function(d){d.classList.remove('active');});
+slides[index].classList.add('active');
+dots[index].classList.add('active');
+current = index;
+}
+
+function next(){
+var n = current + 1;
+if(n >= slides.length) n = 0;
+showSlide(n);
+}
+
+function prev(){
+var p = current - 1;
+if(p < 0) p = slides.length - 1;
+showSlide(p);
+}
+
+prevBtn.addEventListener('click',prev);
+nextBtn.addEventListener('click',next);
+
+showSlide(0);
+
+setInterval(next,5000);
+
+});
 
 </script>
 
 
 {% schema %}
 {
-"name":"Professional Slider",
+"name":"Simple Slider",
 "settings":[],
 "blocks":[
 {
@@ -241,24 +166,19 @@ transform:scale(1.2);
 {
 "type":"image_picker",
 "id":"image",
-"label":"Desktop Image"
-},
-{
-"type":"image_picker",
-"id":"mobile_image",
-"label":"Mobile Image"
+"label":"Image"
 },
 {
 "type":"url",
 "id":"link",
-"label":"Slider Link"
+"label":"Link"
 }
 ]
 }
 ],
 "presets":[
 {
-"name":"Professional Slider"
+"name":"Simple Slider"
 }
 ]
 }
