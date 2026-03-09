@@ -9,6 +9,10 @@
         {% assign video_url = block.settings.video.sources[0].url %}
         {% assign mobile_video_url = block.settings.mobile_video.sources[0].url %}
         
+        {% if block.settings.link != blank %}
+        <a href="{{ block.settings.link }}" class="video-link">
+        {% endif %}
+        
         {% if video_url != blank or mobile_video_url != blank %}
         <div class="video-wrapper">
           {% if video_url != blank %}
@@ -29,6 +33,10 @@
             <span>Add Video</span>
           </div>
         </div>
+        {% endif %}
+        
+        {% if block.settings.link != blank %}
+        </a>
         {% endif %}
       
       {%- when 'slide' -%}
@@ -135,6 +143,11 @@
 
 .video-wrapper {
   position: relative;
+  width: 100%;
+}
+
+.video-link {
+  display: block;
   width: 100%;
 }
 
