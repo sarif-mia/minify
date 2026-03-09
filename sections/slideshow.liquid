@@ -4,28 +4,48 @@
     {%- for block in section.blocks -%}
     <div class="slide-item" data-slide="{{ forloop.index0 }}">
       
-      {% if block.settings.link != blank %}
-      <a href="{{ block.settings.link }}">
-      {% endif %}
-      
-      {% if block.settings.image != blank %}
-      <picture>
-        {% if block.settings.mobile_image != blank %}
-        <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_image | image_url: width: 750 }}">
+      {%- case block.type -%}
+      {%- when 'video' -%}
+        {% if block.settings.video != blank %}
+        <video class="desktop-video" autoplay muted loop playsinline>
+          <source src="{{ block.settings.video }}" type="video/mp4">
+        </video>
         {% endif %}
-        <img src="{{ block.settings.image | image_url: width: 1920 }}" alt="" class="slide-image">
-      </picture>
-      {% endif %}
+        {% if block.settings.mobile_video != blank %}
+        <video class="mobile-video" autoplay muted loop playsinline>
+          <source src="{{ block.settings.mobile_video }}" type="video/mp4">
+        </video>
+        {% endif %}
+        {% if block.settings.video == blank and block.settings.mobile_video == blank %}
+        <div class="placeholder-img">
+          {{ 'video' | placeholder_svg_tag: 'placeholder' }}
+        </div>
+        {% endif %}
       
-      {% if block.settings.image == blank and block.settings.mobile_image == blank %}
-      <div class="placeholder-img">
-        {{ 'image' | placeholder_svg_tag: 'placeholder' }}
-      </div>
-      {% endif %}
-      
-      {% if block.settings.link != blank %}
-      </a>
-      {% endif %}
+      {%- when 'slide' -%}
+        {% if block.settings.link != blank %}
+        <a href="{{ block.settings.link }}">
+        {% endif %}
+        
+        {% if block.settings.image != blank %}
+        <picture>
+          {% if block.settings.mobile_image != blank %}
+          <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_image | image_url: width: 750 }}">
+          {% endif %}
+          <img src="{{ block.settings.image | image_url: width: 1920 }}" alt="" class="slide-image">
+        </picture>
+        {% endif %}
+        
+        {% if block.settings.image == blank and block.settings.mobile_image == blank %}
+        <div class="placeholder-img">
+          {{ 'image' | placeholder_svg_tag: 'placeholder' }}
+        </div>
+        {% endif %}
+        
+        {% if block.settings.link != blank %}
+        </a>
+        {% endif %}
+      {%- endcase -%}
       
       {% if block.settings.title != blank or block.settings.text != blank %}
       <div class="slide-content">
@@ -91,6 +111,29 @@
 
 .slide-item picture {
   display: block;
+}
+
+.slide-item video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.slide-item .desktop-video {
+  display: block;
+}
+
+.slide-item .mobile-video {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .slide-item .desktop-video {
+    display: none;
+  }
+  .slide-item .mobile-video {
+    display: block;
+  }
 }
 
 .slide-content {
@@ -240,7 +283,7 @@
   "blocks": [
     {
       "type": "slide",
-      "name": "Slide",
+      "name": "Image Slide",
       "settings": [
         {
           "type": "image_picker",
@@ -251,6 +294,42 @@
           "type": "image_picker",
           "id": "mobile_image",
           "label": "Mobile Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "text",
+          "id": "btn_text",
+          "label": "Button Text"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video Slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "video",
+          "label": "Desktop Video URL (MP4)"
+        },
+        {
+          "type": "text",
+          "id": "mobile_video",
+          "label": "Mobile Video URL (MP4)"
         },
         {
           "type": "text",
