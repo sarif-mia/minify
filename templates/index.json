@@ -58,7 +58,7 @@
         "collection": "all",
         "products_to_show": 2,
         "title": "Featured products",
-        "columns_desktop": 4,
+        "columns_desktop": 5,
         "columns_mobile": "2",
         "section_width": 1400,
         "show_view_all": true,
