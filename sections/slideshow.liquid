@@ -6,17 +6,16 @@
       
       {%- case block.type -%}
       {%- when 'video' -%}
-        {% if block.settings.video != blank %}
-        <div class="desktop-video">
-          {{ block.settings.video | video_tag: image_size: '1920x', autoplay: true, muted: true, loop: true, controls: false }}
-        </div>
-        {% endif %}
-        {% if block.settings.mobile_video != blank %}
-        <div class="mobile-video">
-          {{ block.settings.mobile_video | video_tag: image_size: '750x', autoplay: true, muted: true, loop: true, controls: false }}
-        </div>
-        {% endif %}
-        {% if block.settings.video == blank and block.settings.mobile_video == blank %}
+        {% assign video_url = block.settings.video.sources[0].url %}
+        {% assign mobile_video_url = block.settings.mobile_video.sources[0].url %}
+        
+        {% if video_url != blank or mobile_video_url != blank %}
+        <video class="slide-video" autoplay muted loop playsinline>
+          {% if video_url != blank %}
+          <source src="{{ video_url }}" type="video/mp4">
+          {% endif %}
+        </video>
+        {% else %}
         <div class="placeholder-img">
           <div style="width:100%;height:500px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;">
             <span>Add Video</span>
@@ -121,31 +120,9 @@
   display: block;
 }
 
-.slide-item .desktop-video video,
-.slide-item .desktop-video video source {
+.slide-item .slide-video {
   width: 100%;
-  height: auto;
   display: block;
-}
-
-.slide-item .mobile-video {
-  display: none;
-}
-
-.slide-item .mobile-video video,
-.slide-item .mobile-video video source {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-@media (max-width: 768px) {
-  .slide-item .desktop-video {
-    display: none;
-  }
-  .slide-item .mobile-video {
-    display: block;
-  }
 }
 
 .slide-content {
@@ -245,7 +222,7 @@
 
   function stopAllVideos() {
     slides.forEach(function(slide) {
-      var videos = slide.querySelectorAll('video');
+      var videos = slide.querySelectorAll('.slide-video');
       videos.forEach(function(v) {
         v.pause();
       });
@@ -254,8 +231,9 @@
 
   function playCurrentVideo() {
     var currentSlide = slides[current];
-    var videos = currentSlide.querySelectorAll('video');
+    var videos = currentSlide.querySelectorAll('.slide-video');
     videos.forEach(function(v) {
+      v.currentTime = 0;
       v.play().catch(function(e){});
     });
   }
@@ -267,7 +245,10 @@
     slides[index].style.display = 'block';
     dots[index].classList.add('active');
     current = index;
-    playCurrentVideo();
+    
+    setTimeout(function() {
+      playCurrentVideo();
+    }, 100);
   }
 
   function goNext() {
