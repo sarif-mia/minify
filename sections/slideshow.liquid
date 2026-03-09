@@ -7,14 +7,14 @@
       {%- case block.type -%}
       {%- when 'video' -%}
         {% if block.settings.video != blank %}
-        <video class="desktop-video" autoplay muted loop playsinline>
-          <source src="{{ block.settings.video }}" type="video/mp4">
-        </video>
+        <div class="desktop-video">
+          {{ block.settings.video | video_tag: image_size: '1920x', autoplay: true, muted: true, loop: true, controls: false }}
+        </div>
         {% endif %}
         {% if block.settings.mobile_video != blank %}
-        <video class="mobile-video" autoplay muted loop playsinline>
-          <source src="{{ block.settings.mobile_video }}" type="video/mp4">
-        </video>
+        <div class="mobile-video">
+          {{ block.settings.mobile_video | video_tag: image_size: '750x', autoplay: true, muted: true, loop: true, controls: false }}
+        </div>
         {% endif %}
         {% if block.settings.video == blank and block.settings.mobile_video == blank %}
         <div class="placeholder-img">
@@ -119,12 +119,22 @@
   display: block;
 }
 
-.slide-item .desktop-video {
+.slide-item .desktop-video video,
+.slide-item .desktop-video video source {
+  width: 100%;
+  height: auto;
   display: block;
 }
 
 .slide-item .mobile-video {
   display: none;
+}
+
+.slide-item .mobile-video video,
+.slide-item .mobile-video video source {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 @media (max-width: 768px) {
@@ -322,14 +332,14 @@
       "name": "Video Slide",
       "settings": [
         {
-          "type": "text",
+          "type": "video",
           "id": "video",
-          "label": "Desktop Video URL (MP4)"
+          "label": "Desktop Video"
         },
         {
-          "type": "text",
+          "type": "video",
           "id": "mobile_video",
-          "label": "Mobile Video URL (MP4)"
+          "label": "Mobile Video"
         },
         {
           "type": "text",
