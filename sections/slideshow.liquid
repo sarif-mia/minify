@@ -1,13 +1,13 @@
-<section class="custom-slider">
+<section class="pro-slider">
 
-<div class="slider-wrapper">
+<div class="slides">
 
-{%- for block in section.blocks -%}
+{% for block in section.blocks %}
 
 <div class="slide">
 
-{% if block.settings.slide_link != blank %}
-<a href="{{ block.settings.slide_link }}">
+{% if block.settings.link != blank %}
+<a href="{{ block.settings.link }}">
 {% endif %}
 
 <picture>
@@ -16,41 +16,39 @@
 <source media="(max-width:749px)" srcset="{{ block.settings.mobile_image | image_url: width: 750 }}">
 {% endif %}
 
-<img
-src="{{ block.settings.image | image_url: width: 2000 }}"
-alt=""
-loading="lazy"
->
+{% if block.settings.image != blank %}
+<img src="{{ block.settings.image | image_url: width: 2000 }}" alt="" loading="lazy">
+{% endif %}
 
 </picture>
 
-{% if block.settings.slide_link != blank %}
+{% if block.settings.link != blank %}
 </a>
 {% endif %}
 
 </div>
 
-{%- endfor -%}
-
-<button class="prev">&#10094;</button>
-<button class="next">&#10095;</button>
-
-<div class="dots"></div>
+{% endfor %}
 
 </div>
+
+<button class="slider-prev">❮</button>
+<button class="slider-next">❯</button>
+
+<div class="slider-dots"></div>
 
 </section>
 
 
 <style>
 
-.custom-slider{
+.pro-slider{
 position:relative;
 width:100%;
 overflow:hidden;
 }
 
-.slider-wrapper{
+.slides{
 position:relative;
 }
 
@@ -60,50 +58,53 @@ display:none;
 
 .slide img{
 width:100%;
-height:auto;
 display:block;
 }
 
-.prev,
-.next{
+.slide:first-child{
+display:block;
+}
+
+.slider-prev,
+.slider-next{
 position:absolute;
 top:50%;
 transform:translateY(-50%);
 background:rgba(0,0,0,0.5);
-color:white;
+color:#fff;
 border:none;
-padding:12px 18px;
-cursor:pointer;
 font-size:22px;
-z-index:10;
+padding:10px 16px;
+cursor:pointer;
+z-index:5;
 }
 
-.prev{
+.slider-prev{
 left:10px;
 }
 
-.next{
+.slider-next{
 right:10px;
 }
 
-.dots{
-text-align:center;
+.slider-dots{
 position:absolute;
 bottom:15px;
 width:100%;
+text-align:center;
 }
 
-.dots span{
+.slider-dots span{
 height:12px;
 width:12px;
 margin:0 4px;
 background:#bbb;
-border-radius:50%;
 display:inline-block;
+border-radius:50%;
 cursor:pointer;
 }
 
-.dots .active{
+.slider-dots .active{
 background:#000;
 }
 
@@ -112,59 +113,64 @@ background:#000;
 
 <script>
 
-let slideIndex = 0;
-const slides = document.querySelectorAll('.slide');
-const dotsContainer = document.querySelector('.dots');
+document.addEventListener("DOMContentLoaded", function(){
 
-slides.forEach((slide, index)=>{
-let dot = document.createElement("span");
-dot.addEventListener("click", ()=>showSlide(index));
+let slides = document.querySelectorAll(".pro-slider .slide");
+let next = document.querySelector(".slider-next");
+let prev = document.querySelector(".slider-prev");
+let dotsContainer = document.querySelector(".slider-dots");
+
+let index = 0;
+
+slides.forEach((slide,i)=>{
+let dot=document.createElement("span");
+dot.addEventListener("click",function(){
+showSlide(i);
+});
 dotsContainer.appendChild(dot);
 });
 
-const dots = dotsContainer.querySelectorAll("span");
+let dots=document.querySelectorAll(".slider-dots span");
 
-function showSlide(n){
+function showSlide(i){
 
 slides.forEach(s=>s.style.display="none");
 dots.forEach(d=>d.classList.remove("active"));
 
-slideIndex=n;
+slides[i].style.display="block";
+dots[i].classList.add("active");
 
-slides[slideIndex].style.display="block";
-dots[slideIndex].classList.add("active");
+index=i;
 
 }
 
 function nextSlide(){
-slideIndex++;
-if(slideIndex>=slides.length){
-slideIndex=0;
-}
-showSlide(slideIndex);
+index++;
+if(index>=slides.length){index=0;}
+showSlide(index);
 }
 
 function prevSlide(){
-slideIndex--;
-if(slideIndex<0){
-slideIndex=slides.length-1;
-}
-showSlide(slideIndex);
+index--;
+if(index<0){index=slides.length-1;}
+showSlide(index);
 }
 
-document.querySelector(".next").onclick=nextSlide;
-document.querySelector(".prev").onclick=prevSlide;
+next.onclick=nextSlide;
+prev.onclick=prevSlide;
 
-showSlide(slideIndex);
+showSlide(index);
 
 setInterval(nextSlide,5000);
+
+});
 
 </script>
 
 
 {% schema %}
 {
-"name":"Custom Slider",
+"name":"Professional Slider",
 "settings":[],
 "blocks":[
 {
@@ -183,15 +189,15 @@ setInterval(nextSlide,5000);
 },
 {
 "type":"url",
-"id":"slide_link",
-"label":"Slide Link"
+"id":"link",
+"label":"Slider Link"
 }
 ]
 }
 ],
 "presets":[
 {
-"name":"Custom Slider"
+"name":"Professional Slider"
 }
 ]
 }
