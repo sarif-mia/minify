@@ -35,6 +35,10 @@
 
 {%- liquid
   assign products_limit = section.settings.products_to_show
+
+  if section.settings.products_to_show_mobile > section.settings.products_to_show
+    assign products_limit = section.settings.products_to_show_mobile
+  endif
 -%}
 
 <div class="color-{{ section.settings.color_scheme }} isolate gradient">
