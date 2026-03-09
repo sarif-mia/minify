@@ -32,8 +32,16 @@
 
 </div>
 
-<button class="slider-prev">❮</button>
-<button class="slider-next">❯</button>
+<button class="slider-prev">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="15 18 9 12 15 6"></polyline>
+  </svg>
+</button>
+<button class="slider-next">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</button>
 
 <div class="slider-dots"></div>
 
@@ -74,9 +82,21 @@ background:rgba(0,0,0,0.5);
 color:#fff;
 border:none;
 font-size:22px;
-padding:10px 16px;
+padding:10px;
 cursor:pointer;
 z-index:5;
+width:44px;
+height:44px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+transition:background 0.3s;
+}
+
+.slider-prev:hover,
+.slider-next:hover{
+background:rgba(0,0,0,0.8);
 }
 
 .slider-prev{
@@ -92,20 +112,29 @@ position:absolute;
 bottom:15px;
 width:100%;
 text-align:center;
+display:flex;
+justify-content:center;
+gap:8px;
 }
 
 .slider-dots span{
 height:12px;
 width:12px;
-margin:0 4px;
-background:#bbb;
+background:rgba(255,255,255,0.5);
 display:inline-block;
 border-radius:50%;
 cursor:pointer;
+transition:all 0.3s;
+border:2px solid #fff;
+}
+
+.slider-dots span:hover{
+background:rgba(255,255,255,0.8);
 }
 
 .slider-dots .active{
-background:#000;
+background:#fff;
+transform:scale(1.2);
 }
 
 </style>
