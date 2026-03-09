@@ -1,185 +1,310 @@
-<section class="slideshow">
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
 
-{% for block in section.blocks %}
-<div class="slide" data-index="{{ forloop.index0 }}">
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
 
-{% if block.settings.link != blank %}
-<a href="{{ block.settings.link }}">
-{% endif %}
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
 
-{% if block.settings.image != blank %}
-<img src="{{ block.settings.image | image_url: width: 2000 }}" alt="" {% if forloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}>
-{% endif %}
+<script src="{{ 'slider.js' | asset_url }}" defer="defer"></script>
 
-{% if block.settings.link != blank %}
-</a>
-{% endif %}
+<section class="slideshow-section section-{{ section.id }}-padding">
+  <div class="slideshow page-width" id="Slideshow-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <div class="slideshow__slide" {{ block.shopify_attributes }} data-index="{{ forloop.index0 }}">
+        {%- if block.settings.image != blank -%}
+          {%- assign height = block.settings.image.width | divided_by: block.settings.image.aspect_ratio | round -%}
+          {{ block.settings.image | image_url: width: 3840 | image_tag:
+            loading: 'lazy',
+            height: height,
+            class: 'slideshow__image',
+            sizes: '100vw',
+            widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+          }}
+        {%- else -%}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg slideshow__image' }}
+        {%- endif -%}
 
-</div>
-{% endfor %}
+        <div class="slideshow__text-wrapper">
+          {%- if block.settings.heading != blank -%}
+            <h2 class="slideshow__heading">{{ block.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if block.settings.subheading != blank -%}
+            <p class="slideshow__subheading">{{ block.settings.subheading | escape }}</p>
+          {%- endif -%}
+          {%- if block.settings.button_label != blank -%}
+            <a href="{{ block.settings.link }}" class="slideshow__button button">{{ block.settings.button_label | escape }}</a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
 
-</div>
+  <div class="slideshow__controls">
+    <button class="slideshow__arrow slideshow__arrow--prev" name="previous" aria-label="Previous slide" type="button">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    
+    {%- if section.blocks.size > 1 -%}
+      <div class="slideshow__dots">
+        {%- for block in section.blocks -%}
+          <button class="slideshow__dot{% if forloop.first %} active{% endif %}" data-index="{{ forloop.index0 }}" aria-label="Go to slide {{ forloop.index }}" type="button"></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
 
-<button class="prev-btn">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-</button>
-<button class="next-btn">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-</button>
-
-<div class="dots"></div>
-
+    <button class="slideshow__arrow slideshow__arrow--next" name="next" aria-label="Next slide" type="button">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  </div>
 </section>
 
+{%- style -%}
+  .slideshow-section {
+    position: relative;
+    overflow: hidden;
+  }
 
-<style>
+  .slideshow {
+    position: relative;
+    width: 100%;
+  }
 
-.slideshow{
-position:relative;
-width:100%;
-overflow:hidden;
-}
+  .slideshow__slide {
+    display: none;
+    position: relative;
+  }
 
-.slide{
-display:none;
-}
+  .slideshow__slide:first-child {
+    display: block;
+  }
 
-.slide.active{
-display:block;
-}
+  .slideshow__image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
 
-.slide img{
-width:100%;
-height:auto;
-display:block;
-}
+  .slideshow__text-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+  }
 
-.prev-btn,.next-btn{
-position:absolute;
-top:50%;
-transform:translateY(-50%);
-background:rgba(0,0,0,0.5);
-color:#fff;
-border:none;
-padding:12px;
-cursor:pointer;
-z-index:10;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-}
+  .slideshow__heading {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: inherit;
+  }
 
-.prev-btn{left:10px;}
-.next-btn{right:10px;}
+  .slideshow__subheading {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: inherit;
+  }
 
-.dots{
-position:absolute;
-bottom:20px;
-left:0;
-right:0;
-text-align:center;
-}
+  .slideshow__button {
+    background: #fff;
+    color: #000;
+    padding: 12px 24px;
+    text-decoration: none;
+    display: inline-block;
+  }
 
-.dots span{
-display:inline-block;
-width:10px;
-height:10px;
-margin:0 5px;
-background:rgba(255,255,255,0.5);
-border-radius:50%;
-cursor:pointer;
-border:2px solid #fff;
-}
+  .slideshow__controls {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    z-index: 10;
+  }
 
-.dots span.active{
-background:#fff;
-}
+  .slideshow__arrow {
+    background: rgba(0,0,0,0.5);
+    border: none;
+    color: #fff;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-</style>
+  .slideshow__dots {
+    display: flex;
+    gap: 10px;
+  }
 
+  .slideshow__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    border: 2px solid #fff;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .slideshow__dot.active {
+    background: #fff;
+  }
+{%- endstyle -%}
 
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('Slideshow-{{ section.id }}');
+    if (!slider) return;
+    
+    const slides = slider.querySelectorAll('.slideshow__slide');
+    const dots = slider.parentElement.querySelectorAll('.slideshow__dot');
+    const prevBtn = slider.parentElement.querySelector('.slideshow__arrow--prev');
+    const nextBtn = slider.parentElement.querySelector('.slideshow__arrow--next');
+    
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+    let autoPlayInterval;
 
-document.addEventListener('DOMContentLoaded',function(){
+    function goToSlide(index) {
+      slides.forEach(s => s.style.display = 'none');
+      dots.forEach(d => d.classList.remove('active'));
+      
+      slides[index].style.display = 'block';
+      dots[index].classList.add('active');
+      currentIndex = index;
+    }
 
-var slides = document.querySelectorAll('.slideshow .slide');
-var dotsContainer = document.querySelector('.slideshow .dots');
-var prevBtn = document.querySelector('.slideshow .prev-btn');
-var nextBtn = document.querySelector('.slideshow .next-btn');
-var current = 0;
+    function nextSlide() {
+      const next = (currentIndex + 1) % totalSlides;
+      goToSlide(next);
+    }
 
-if(slides.length === 0) return;
+    function prevSlide() {
+      const prev = (currentIndex - 1 + totalSlides) % totalSlides;
+      goToSlide(prev);
+    }
 
-// Create dots
-slides.forEach(function(slide,i){
-var dot = document.createElement('span');
-dot.addEventListener('click',function(){
-showSlide(i);
-});
-dotsContainer.appendChild(dot);
-});
+    if (prevBtn) prevBtn.addEventListener('click', function() {
+      clearInterval(autoPlayInterval);
+      prevSlide();
+      startAutoPlay();
+    });
 
-var dots = dotsContainer.querySelectorAll('span');
+    if (nextBtn) nextBtn.addEventListener('click', function() {
+      clearInterval(autoPlayInterval);
+      nextSlide();
+      startAutoPlay();
+    });
 
-function showSlide(index){
-slides.forEach(function(s){s.classList.remove('active');});
-dots.forEach(function(d){d.classList.remove('active');});
-slides[index].classList.add('active');
-dots[index].classList.add('active');
-current = index;
-}
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', function() {
+        clearInterval(autoPlayInterval);
+        goToSlide(index);
+        startAutoPlay();
+      });
+    });
 
-function next(){
-var n = current + 1;
-if(n >= slides.length) n = 0;
-showSlide(n);
-}
+    function startAutoPlay() {
+      autoPlayInterval = setInterval(nextSlide, 5000);
+    }
 
-function prev(){
-var p = current - 1;
-if(p < 0) p = slides.length - 1;
-showSlide(p);
-}
-
-prevBtn.addEventListener('click',prev);
-nextBtn.addEventListener('click',next);
-
-showSlide(0);
-
-setInterval(next,5000);
-
-});
-
+    if (totalSlides > 1) {
+      goToSlide(0);
+      startAutoPlay();
+    }
+  });
 </script>
-
 
 {% schema %}
 {
-"name":"Simple Slider",
-"settings":[],
-"blocks":[
-{
-"type":"slide",
-"name":"Slide",
-"settings":[
-{
-"type":"image_picker",
-"id":"image",
-"label":"Image"
-},
-{
-"type":"url",
-"id":"link",
-"label":"Link"
-}
-]
-}
-],
-"presets":[
-{
-"name":"Simple Slider"
-}
-]
+  "name": "Slideshow",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Desktop Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button Label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slideshow",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
+    }
+  ]
 }
 {% endschema %}
