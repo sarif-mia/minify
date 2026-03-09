@@ -61,14 +61,8 @@
   assign columns_mobile_int = section.settings.columns_mobile | plus: 0
   assign columns_desktop_int = section.settings.columns_desktop | plus: 0
   
-  assign products_to_show_mobile = section.settings.products_to_show_mobile | default: section.settings.columns_mobile
-  assign products_to_display_mobile = section.settings.collection.all_products_count
-  if section.settings.collection.all_products_count > products_to_show_mobile
-    assign products_to_display_mobile = products_to_show_mobile
-  endif
-  
   assign show_mobile_slider = false
-  if section.settings.swipe_on_mobile and products_to_display_mobile > columns_mobile_int
+  if section.settings.swipe_on_mobile and products_to_display > columns_mobile_int
     assign show_mobile_slider = true
   endif
 
@@ -135,7 +129,7 @@
         {%- if section.settings.collection.products.size > 0 -%}
           {% assign lazy_load = false %}
           {% paginate section.settings.collection.products by section.settings.products_to_show %}
-            {%- for product in section.settings.collection.products limit: products_to_show_mobile -%}
+            {%- for product in section.settings.collection.products limit: section.settings.products_to_show -%}
               {% if lazy_load == false and forloop.index > max_columns_to_show %}
                 {% assign lazy_load = true %}
               {% endif %}
