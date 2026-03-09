@@ -34,11 +34,7 @@
 {%- endstyle -%}
 
 {%- liquid
-  assign products_to_display = section.settings.collection.all_products_count
-  if section.settings.collection.all_products_count > section.settings.products_to_show
-    assign products_to_display = section.settings.products_to_show
-    assign more_in_collection = true
-  endif
+  assign products_limit = section.settings.products_to_show
 -%}
 
 <div class="color-{{ section.settings.color_scheme }} isolate gradient">
@@ -60,7 +56,7 @@
 
       <div class="grid grid--{{ section.settings.columns_desktop }}-col-desktop grid--{{ section.settings.columns_mobile }}-col-tablet-down">
         {%- if section.settings.collection and section.settings.collection.products.size > 0 -%}
-          {%- for product in section.settings.collection.products limit: section.settings.products_to_show -%}
+          {%- for product in section.settings.collection.products limit: products_limit -%}
             <div class="grid__item">
               {% render 'card-product', card_product: product %}
             </div>
@@ -91,6 +87,15 @@
       "step": 1,
       "default": 4,
       "label": "Products to show"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show_mobile",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 2,
+      "label": "Products on mobile"
     },
     {
       "type": "text",
