@@ -10,7 +10,7 @@
         {% assign mobile_video_url = block.settings.mobile_video.sources[0].url %}
         
         {% if video_url != blank or mobile_video_url != blank %}
-        <video class="slide-video" autoplay muted loop playsinline>
+        <video class="slide-video" autoplay muted playsinline>
           {% if video_url != blank %}
           <source src="{{ video_url }}" type="video/mp4">
           {% endif %}
@@ -217,38 +217,61 @@
   var count = slides.length;
   var current = 0;
   var timer;
+  var isVideoSlide = false;
 
   if(count === 0) return;
+
+  function clearTimer() {
+    if(timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  }
 
   function stopAllVideos() {
     slides.forEach(function(slide) {
       var videos = slide.querySelectorAll('.slide-video');
       videos.forEach(function(v) {
         v.pause();
+        v.currentTime = 0;
       });
     });
   }
 
+  function hasVideo(slide) {
+    return slide.querySelector('.slide-video') !== null;
+  }
+
   function playCurrentVideo() {
     var currentSlide = slides[current];
-    var videos = currentSlide.querySelectorAll('.slide-video');
-    videos.forEach(function(v) {
-      v.currentTime = 0;
-      v.play().catch(function(e){});
-    });
+    var video = currentSlide.querySelector('.slide-video');
+    if(video) {
+      video.play().catch(function(e){});
+      
+      video.addEventListener('ended', function() {
+        goNext();
+      });
+    }
   }
 
   function show(index) {
     stopAllVideos();
+    clearTimer();
+    
     slides.forEach(function(s){ s.style.display = 'none'; });
     dots.forEach(function(d){ d.classList.remove('active'); });
+    
     slides[index].style.display = 'block';
     dots[index].classList.add('active');
     current = index;
     
-    setTimeout(function() {
+    isVideoSlide = hasVideo(slides[index]);
+    
+    if(isVideoSlide) {
       playCurrentVideo();
-    }, 100);
+    } else {
+      timer = setInterval(goNext, 5000);
+    }
   }
 
   function goNext() {
@@ -261,28 +284,19 @@
 
   next.addEventListener('click', function(){
     goNext();
-    resetTimer();
   });
 
   prev.addEventListener('click', function(){
     goPrev();
-    resetTimer();
   });
 
   dots.forEach(function(dot, i){
     dot.addEventListener('click', function(){
       show(i);
-      resetTimer();
     });
   });
 
-  function resetTimer() {
-    clearInterval(timer);
-    timer = setInterval(goNext, 5000);
-  }
-
   show(0);
-  timer = setInterval(goNext, 5000);
 })();
 </script>
 
