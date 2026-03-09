@@ -48,6 +48,14 @@
   .collection__title .view-all-btn {
     flex-shrink: 0;
   }
+
+  .collection__title,
+  .slider-mobile-gutter,
+  .collection__title + slider-component {
+    max-width: {{ section.settings.section_width }}px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 {%- endstyle -%}
 
 {%- liquid
@@ -351,6 +359,15 @@
       "id": "full_width",
       "label": "t:sections.featured-collection.settings.full_width.label",
       "default": false
+    },
+    {
+      "type": "range",
+      "id": "section_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "default": 1200,
+      "label": "Section width (px)"
     },
     {
       "type": "checkbox",
