@@ -9,11 +9,12 @@
       {% endif %}
       
       {% if block.settings.image != blank %}
-      <img src="{{ block.settings.image | image_url: width: 1920 }}" alt="" class="desktop-img">
-      {% endif %}
-      
-      {% if block.settings.mobile_image != blank %}
-      <img src="{{ block.settings.mobile_image | image_url: width: 750 }}" alt="" class="mobile-img">
+      <picture>
+        {% if block.settings.mobile_image != blank %}
+        <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_image | image_url: width: 750 }}">
+        {% endif %}
+        <img src="{{ block.settings.image | image_url: width: 1920 }}" alt="" class="slide-image">
+      </picture>
       {% endif %}
       
       {% if block.settings.image == blank and block.settings.mobile_image == blank %}
@@ -81,23 +82,15 @@
   display: block;
 }
 
-.slide-item img {
+.slide-item img,
+.slide-item picture img {
   width: 100%;
   height: auto;
   display: block;
 }
 
-.mobile-img {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .desktop-img {
-    display: none;
-  }
-  .mobile-img {
-    display: block;
-  }
+.slide-item picture {
+  display: block;
 }
 
 .slide-content {
