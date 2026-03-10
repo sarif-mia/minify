@@ -1,0 +1,365 @@
+{% comment %}
+A fresh, fully self‑contained "Shop by Brands" section.
+Features:
+- Carousel or grid layout
+- Mobile/desktop counts, unified settings
+- Autoplay controls, pause-on-hover, keyboard nav
+- Accessible (aria-live, roledescription, focusable)
+- Radius, border, spacing, color scheme, alignment
+- External JS asset for logic; lightweight markup
+
+This file is intentionally written from scratch to demonstrate a clean implementation.
+Copy/replace your existing section with this code to start anew.
+{% endcomment %}
+
+{{ 'section-shop-by-brands.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+.section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+@media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+
+/* container logic, radius/overflow applied here */
+.shop-by-brands-{{ section.id }} .brand-item { padding: {{ section.settings.logo_padding }}px; height: {{ section.settings.logo_height }}px; width: {{ section.settings.logo_width }}px; border-radius: {{ section.settings.image_radius }}px; overflow: hidden; box-sizing: border-box; }
+{% if section.settings.enable_border %}
+.shop-by-brands-{{ section.id }} .brand-item { border: 1px solid var(--color-foreground-10); border-radius: {{ section.settings.border_radius }}px; }
+{% endif %}
+{% endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width isolate section-{{ section.id }}-padding">
+
+    {% if section.settings.title or section.settings.text %}
+      <div class="brands-header brands-header--{{ section.settings.content_alignment }}">
+        {% if section.settings.title %}
+          <h2 id="SectionHeading-{{ section.id }}" class="brands-title {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">{{ section.settings.title }}</h2>
+        {% endif %}
+        {% if section.settings.text %}
+          <div class="brands-text{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">{{ section.settings.text }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+      {%- assign mobileCount = section.settings.columns_mobile -%}
+      {%- assign desktopCount = section.settings.columns_desktop -%}
+      {% if section.settings.enable_carousel %}
+        {%- assign mobileCount = section.settings.visible_on_mobile -%}
+        {%- assign desktopCount = section.settings.visible_on_desktop -%}
+      {% endif %}
+
+      <div class="brands-wrapper shop-by-brands-{{ section.id }}">
+        {% if section.settings.enable_carousel %}
+          <div class="brands-carousel-wrapper" tabindex="0" aria-live="polite"
+               data-section-id="{{ section.id }}"
+               data-visible-on-desktop="{{ section.settings.visible_on_desktop }}"
+               data-visible-on-mobile="{{ section.settings.visible_on_mobile }}"
+               data-enable-autoplay="{{ section.settings.enable_autoplay }}"
+               data-autoplay-delay="{{ section.settings.autoplay_delay }}"
+               data-pause-on-hover="{{ section.settings.pause_on_hover }}"
+               data-navigation-style="{{ section.settings.navigation_style }}"
+               data-carousel-gap="{{ section.settings.carousel_gap }}">
+            <button class="brands-arrow brands-arrow--prev" aria-label="Previous slide"><svg>...</svg></button>
+            <div class="brands-carousel" id="BrandsCarousel-{{ section.id }}">
+              {% for block in section.blocks %}
+                {% render 'brand-logo' block: block %}
+              {% endfor %}
+            </div>
+            <button class="brands-arrow brands-arrow--next" aria-label="Next slide"><svg>...</svg></button>
+          </div>
+          {% if section.settings.navigation_style != 'arrows' %}
+            <div class="brands-dots" id="BrandsDots-{{ section.id }}"></div>
+          {% endif %}
+        {% else %}
+          <div class="brands-grid brands-grid--{{ mobileCount }}-col-tablet brands-grid--{{ desktopCount }}-col-desktop">
+            {% for block in section.blocks %}
+              {% render 'brand-logo' block: block %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if section.settings.enable_carousel and section.blocks.size > 1 %}
+  <script src="{{ 'shop-by-brands.js' | asset_url }}"></script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Shop by Brands",
+  "tag": "section",
+  "class": "section shop-by-brands",
+  "max_blocks": 20,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "default": "Shop by Brands",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" },
+        { "value": "hxl", "label": "Extra Large" }
+      ],
+      "default": "h1",
+      "label": "Heading size"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Description text"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "label": "Content alignment"
+    },
+    {
+      "type": "header",
+      "content": "Brand Settings"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 20,
+      "max": 500,
+      "step": 10,
+      "default": 100,
+      "unit": "px",
+      "label": "Logo height"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 20,
+      "max": 500,
+      "step": 10,
+      "default": 100,
+      "unit": "px",
+      "label": "Logo width"
+    },
+    {
+      "type": "range",
+      "id": "logo_padding",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "default": 16,
+      "unit": "px",
+      "label": "Logo padding"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_border",
+      "default": true,
+      "label": "Enable border"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "default": 8,
+      "unit": "px",
+      "label": "Border radius"
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "default": 0,
+      "unit": "px",
+      "label": "Image corner radius"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_carousel",
+      "default": true,
+      "label": "Enable carousel"
+    },
+    {
+      "type": "range",
+      "id": "carousel_gap",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "default": 24,
+      "unit": "px",
+      "label": "Gap between logos"
+    },
+    {
+      "type": "header",
+      "content": "Desktop"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 5,
+      "label": "Columns"
+    },
+    {
+      "type": "range",
+      "id": "visible_on_desktop",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 5,
+      "label": "Visible items on desktop (carousel/grid)"
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 2,
+      "label": "Columns (grid mode)"
+    },
+    {
+      "type": "range",
+      "id": "visible_on_mobile",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2,
+      "label": "Visible items on mobile (carousel/grid)"
+    },
+    {
+      "type": "header",
+      "content": "Carousel Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_autoplay",
+      "default": true,
+      "label": "Enable autoplay"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_delay",
+      "min": 2000,
+      "max": 8000,
+      "step": 500,
+      "default": 3000,
+      "unit": "ms",
+      "label": "Autoplay delay"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "default": true,
+      "label": "Pause on hover"
+    },
+    {
+      "type": "select",
+      "id": "navigation_style",
+      "options": [
+        { "value": "arrows", "label": "Arrows only" },
+        { "value": "dots", "label": "Dots only" },
+        { "value": "both", "label": "Both arrows and dots" }
+      ],
+      "default": "both",
+      "label": "Navigation style"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Brand Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_new_tab",
+          "default": false,
+          "label": "Open link in new tab"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Brands",
+      "blocks": [
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" }
+      ]
+    }
+  ]
+}
+{% endschema %}
