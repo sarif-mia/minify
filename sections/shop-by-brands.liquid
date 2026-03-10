@@ -25,7 +25,7 @@
 <div class="color-{{ section.settings.color_scheme }} gradient">
   <div class="page-width isolate section-{{ section.id }}-padding">
     {%- if section.settings.title != blank -%}
-      <div class="title-wrapper-with-link title-wrapper--self-padded-mobile title-wrapper--no-top-margin">
+      <div class="title-wrapper-with-link title-wrapper--self-padded-mobile title-wrapper--no-top-margin title-wrapper--{{ section.settings.heading_alignment }}">
         <h2
           id="SectionHeading-{{ section.id }}"
           class="title {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
@@ -36,7 +36,7 @@
     {%- endif -%}
 
     {%- if section.settings.text != blank -%}
-      <div class="brands-text{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+      <div class="brands-text brands-text--{{ section.settings.text_alignment }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
         {{ section.settings.text }}
       </div>
     {%- endif -%}
@@ -299,9 +299,49 @@
       "label": "Heading size"
     },
     {
+      "type": "select",
+      "id": "heading_alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "label": "Heading alignment"
+    },
+    {
       "type": "richtext",
       "id": "text",
       "label": "Description text"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "label": "Text alignment"
     },
     {
       "type": "range",

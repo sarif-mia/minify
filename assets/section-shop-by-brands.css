@@ -6,9 +6,32 @@
   margin-bottom: 2rem;
 }
 
+.shop-by-brands .title-wrapper--left {
+  text-align: left;
+}
+
+.shop-by-brands .title-wrapper--center {
+  text-align: center;
+}
+
+.shop-by-brands .title-wrapper--right {
+  text-align: right;
+}
+
 .shop-by-brands .brands-text {
   margin-bottom: 2rem;
+}
+
+.shop-by-brands .brands-text--left {
+  text-align: left;
+}
+
+.shop-by-brands .brands-text--center {
   text-align: center;
+}
+
+.shop-by-brands .brands-text--right {
+  text-align: right;
 }
 
 .shop-by-brands .brands-text p {
