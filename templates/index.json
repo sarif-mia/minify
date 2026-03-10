@@ -139,6 +139,7 @@
         "heading_size": "h2",
         "text": "",
         "content_alignment": "left",
+        "section_width": "full",
         "logo_height": 120,
         "logo_width": 120,
         "logo_padding": 4,
