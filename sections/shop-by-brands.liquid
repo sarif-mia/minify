@@ -26,7 +26,7 @@
   
   .shop-by-brands-{{ section.id }} .brand-item .brand-image {
     height: {{ section.settings.logo_height }}px;
-    width: auto;
+    width: {{ section.settings.logo_width }}px;
     max-width: 100%;
     object-fit: contain;
     border-radius: {{ section.settings.image_radius }}px;
@@ -34,6 +34,7 @@
   
   .shop-by-brands-{{ section.id }} .brand-item .brand-placeholder {
     height: {{ section.settings.logo_height }}px;
+    width: {{ section.settings.logo_width }}px;
     border-radius: {{ section.settings.image_radius }}px;
   }
 {%- endstyle -%}
@@ -390,6 +391,16 @@
       "default": 100,
       "unit": "px",
       "label": "Logo height"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 40,
+      "max": 200,
+      "step": 10,
+      "default": 100,
+      "unit": "px",
+      "label": "Logo width"
     },
     {
       "type": "range",
