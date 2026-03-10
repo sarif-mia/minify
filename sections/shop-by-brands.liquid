@@ -68,269 +68,54 @@
       <div class="brands-wrapper shop-by-brands-{{ section.id }}">
         
         {%- if section.settings.enable_carousel -%}
-          <div class="brands-carousel-wrapper">
+          {%- comment -%} Carousel mode: place controls and data attributes for the JS initializer {%- endcomment -%}
+          <div class="brands-carousel-wrapper"
+               data-section-id="{{ section.id }}"
+               data-visible-on-desktop="{{ section.settings.visible_on_desktop }}"
+               data-visible-on-mobile="{{ section.settings.visible_on_mobile }}"
+               data-autoplay-delay="{{ section.settings.autoplay_delay }}"
+               data-navigation-style="{{ section.settings.navigation_style }}"
+               data-carousel-gap="{{ section.settings.carousel_gap }}">
+
             <button class="brands-arrow brands-arrow--prev" aria-label="Previous slide">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            
+
             <div class="brands-carousel" id="BrandsCarousel-{{ section.id }}">
               {%- for block in section.blocks -%}
-                <div class="brand-item" {{ block.shopify_attributes }}>
-                  {%- if block.settings.link != blank -%}
-                    <a href="{{ block.settings.link }}" class="brand-link" {% if block.settings.open_new_tab %}target="_blank" rel="noopener"{% endif %}>
-                  {%- endif -%}
-                  {%- if block.settings.image != blank -%}
-                    <img
-                      src="{{ block.settings.image | image_url: width: section.settings.logo_width }}"
-                      alt="{{ block.settings.image.alt | escape }}"
-                      loading="lazy"
-                      class="brand-image"
-                      width="{{ section.settings.logo_width }}"
-                      height="{{ section.settings.logo_height }}"
-                    >
-                  {%- else -%}
-                    <div class="brand-placeholder">
-                      {{ 'image' | placeholder_svg_tag: 'placeholder' }}
-                    </div>
-                  {%- endif -%}
-                  {%- if block.settings.link != blank -%}
-                    </a>
-                  {%- endif -%}
-                </div>
+                {%- render 'brand-logo' block: block -%}
               {%- endfor -%}
             </div>
-            
+
             <button class="brands-arrow brands-arrow--next" aria-label="Next slide">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </button>
           </div>
-          
+
           {%- if section.settings.navigation_style != 'arrows' -%}
             <div class="brands-dots" id="BrandsDots-{{ section.id }}"></div>
           {%- endif -%}
-          
+
         {%- else -%}
+          {%- comment -%} Grid mode is simpler; just render bodies {%- endcomment -%}
           <div class="brands-grid brands-grid--{{ section.settings.columns_mobile }}-col-tablet brands-grid--{{ section.settings.columns_desktop }}-col-desktop">
             {%- for block in section.blocks -%}
-              <div class="brand-item" {{ block.shopify_attributes }}>
-                {%- if block.settings.link != blank -%}
-                  <a href="{{ block.settings.link }}" class="brand-link" {% if block.settings.open_new_tab %}target="_blank" rel="noopener"{% endif %}>
-                {%- endif -%}
-                {%- if block.settings.image != blank -%}
-                  <img
-                    src="{{ block.settings.image | image_url: width: 300 }}"
-                    alt="{{ block.settings.image.alt | escape }}"
-                    loading="lazy"
-                    class="brand-image"
-                    width="{{ block.settings.image.width }}"
-                    height="{{ block.settings.image.height }}"
-                  >
-                {%- else -%}
-                  <div class="brand-placeholder">
-                    {{ 'image' | placeholder_svg_tag: 'placeholder' }}
-                  </div>
-                {%- endif -%}
-                {%- if block.settings.link != blank -%}
-                  </a>
-                {%- endif -%}
-              </div>
+              {%- render 'brand-logo' block: block -%}
             {%- endfor -%}
           </div>
         {%- endif -%}
-        
+
       </div>
     {%- endif -%}
   </div>
 </div>
 
 {%- if section.settings.enable_carousel and section.blocks.size > 1 -%}
-<script>
-(function() {
-  const section = document.querySelector('#BrandsCarousel-{{ section.id }}');
-  if (!section) return;
-
-  const wrapper = section.closest('.brands-carousel-wrapper');
-  const prevBtn = wrapper.querySelector('.brands-arrow--prev');
-  const nextBtn = wrapper.querySelector('.brands-arrow--next');
-  const dotsContainer = document.querySelector('#BrandsDots-{{ section.id }}');
-  
-  const items = section.querySelectorAll('.brand-item');
-  const totalItems = items.length;
-  const desktopVisible = {{ section.settings.visible_on_desktop | default: 5 }};
-  const mobileVisible = {{ section.settings.visible_on_mobile | default: 2 }};
-  const autoPlayDelay = {{ section.settings.autoplay_delay | default: 3000 }};
-  const navStyle = '{{ section.settings.navigation_style | default: 'arrows' }}';
-  
-  let currentIndex = 0;
-  let intervalId = null;
-  let isAnimating = false;
-
-  function getVisibleCount() {
-    if (window.innerWidth <= 749) {
-      return mobileVisible;
-    }
-    return desktopVisible;
-  }
-
-  function getItemWidth() {
-    const containerWidth = section.offsetWidth;
-    const visible = getVisibleCount();
-    const gap = {{ section.settings.carousel_gap | default: 24 }};
-    return ((containerWidth - (gap * (visible - 1))) / visible);
-  }
-
-  function getMaxIndex() {
-    return Math.max(0, totalItems - getVisibleCount());
-  }
-
-  function updateCarousel() {
-    if (isAnimating) return;
-    isAnimating = true;
-    
-    const visible = getVisibleCount();
-    const itemWidth = getItemWidth();
-    const gap = {{ section.settings.carousel_gap | default: 24 }};
-    const translateX = -(currentIndex * (itemWidth + gap));
-    
-    section.style.transition = 'transform 0.5s ease';
-    section.style.transform = `translateX(${translateX}px)`;
-    
-    // Update items width
-    items.forEach((item, index) => {
-      item.style.flex = `0 0 ${itemWidth}px`;
-      item.style.maxWidth = `${itemWidth}px`;
-    });
-    
-    // Update dots
-    if (dotsContainer && (navStyle === 'dots' || navStyle === 'both')) {
-      const dots = dotsContainer.querySelectorAll('.brand-dot');
-      dots.forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentIndex);
-      });
-    }
-    
-    setTimeout(() => {
-      isAnimating = false;
-    }, 500);
-  }
-
-  function goToSlide(index) {
-    const maxIndex = getMaxIndex();
-    currentIndex = Math.max(0, Math.min(index, maxIndex));
-    updateCarousel();
-  }
-
-  function nextSlide() {
-    const maxIndex = getMaxIndex();
-    currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
-    updateCarousel();
-  }
-
-  function prevSlide() {
-    const maxIndex = getMaxIndex();
-    currentIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1;
-    updateCarousel();
-  }
-
-  function startAutoPlay() {
-    if (autoPlayDelay > 0) {
-      intervalId = setInterval(nextSlide, autoPlayDelay);
-    }
-  }
-
-  function stopAutoPlay() {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-    }
-  }
-
-  // Create dots
-  if (dotsContainer && (navStyle === 'dots' || navStyle === 'both')) {
-    const maxIndex = getMaxIndex();
-    for (let i = 0; i <= maxIndex; i++) {
-      const dot = document.createElement('button');
-      dot.className = 'brand-dot' + (i === 0 ? ' active' : '');
-      dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-      dot.addEventListener('click', () => {
-        stopAutoPlay();
-        goToSlide(i);
-        startAutoPlay();
-      });
-      dotsContainer.appendChild(dot);
-    }
-  }
-
-  // Arrow events
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      stopAutoPlay();
-      prevSlide();
-      startAutoPlay();
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      stopAutoPlay();
-      nextSlide();
-      startAutoPlay();
-    });
-  }
-
-  // Pause on hover
-  if (wrapper) {
-    wrapper.addEventListener('mouseenter', stopAutoPlay);
-    wrapper.addEventListener('mouseleave', startAutoPlay);
-  }
-
-  // Touch swipe support
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  section.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    stopAutoPlay();
-  }, { passive: true });
-
-  section.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-    startAutoPlay();
-  }, { passive: true });
-
-  function handleSwipe() {
-    const swipeThreshold = 50;
-    const diff = touchStartX - touchEndX;
-    
-    if (Math.abs(diff) > swipeThreshold) {
-      if (diff > 0) {
-        nextSlide();
-      } else {
-        prevSlide();
-      }
-    }
-  }
-
-  // Initial setup
-  setTimeout(updateCarousel, 100);
-  startAutoPlay();
-
-  // Handle resize
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      currentIndex = 0;
-      updateCarousel();
-    }, 250);
-  });
-})();
-</script>
+  <script src="{{ 'shop-by-brands.js' | asset_url }}"></script>
 {%- endif -%}
 
 {% schema %}

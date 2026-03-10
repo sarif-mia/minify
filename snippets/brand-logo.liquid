@@ -1,0 +1,30 @@
+{%- comment -%}
+Reusable snippet for rendering a single brand block.
+Accepts `block` and relies on `section` being in scope for settings.
+{%- endcomment -%}
+
+{%- assign b = block -%}
+<div class="brand-item" {{ b.shopify_attributes }}>
+  {%- if b.settings.link != blank -%}
+    <a href="{{ b.settings.link }}" class="brand-link" {% if b.settings.open_new_tab %}target="_blank" rel="noopener"{% endif %}>
+  {%- endif -%}
+
+  {%- if b.settings.image != blank -%}
+    <img
+      src="{{ b.settings.image | image_url: width: section.settings.logo_width }}"
+      alt="{{ b.settings.image.alt | escape }}"
+      loading="lazy"
+      class="brand-image"
+      width="{{ section.settings.logo_width }}"
+      height="{{ section.settings.logo_height }}"
+    >
+  {%- else -%}
+    <div class="brand-placeholder">
+      {{ 'image' | placeholder_svg_tag: 'placeholder' }}
+    </div>
+  {%- endif -%}
+
+  {%- if b.settings.link != blank -%}
+    </a>
+  {%- endif -%}
+</div>
