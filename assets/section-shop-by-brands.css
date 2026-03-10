@@ -1,0 +1,204 @@
+.shop-by-brands {
+  width: 100%;
+}
+
+.shop-by-brands .title-wrapper-with-link {
+  margin-bottom: 2rem;
+}
+
+.shop-by-brands .brands-text {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.shop-by-brands .brands-text p {
+  margin: 0;
+}
+
+.shop-by-brands .brands-wrapper {
+  width: 100%;
+}
+
+/* Grid Layout */
+.shop-by-brands .brands-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.shop-by-brands .brands-grid--2-col-mobile {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.shop-by-brands .brands-grid--3-col-mobile {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.shop-by-brands .brands-grid--4-col-mobile {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.shop-by-brands .brands-grid--2-col-desktop {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.shop-by-brands .brands-grid--3-col-desktop {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.shop-by-brands .brands-grid--4-col-desktop {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.shop-by-brands .brands-grid--5-col-desktop {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.shop-by-brands .brands-grid--6-col-desktop {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.shop-by-brands .brands-grid--7-col-desktop {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.shop-by-brands .brands-grid--8-col-desktop {
+  grid-template-columns: repeat(8, 1fr);
+}
+
+@media screen and (min-width: 750px) {
+  .shop-by-brands .brands-grid--2-col-mobile {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .shop-by-brands .brands-grid--3-col-mobile {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .shop-by-brands .brands-grid--4-col-mobile {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Brand Item */
+.shop-by-brands .brand-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--color-background);
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shop-by-brands .brand-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.shop-by-brands .brand-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.shop-by-brands .brand-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+.shop-by-brands .brand-item:hover .brand-image {
+  filter: grayscale(0%);
+}
+
+.shop-by-brands .brand-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop-by-brands .brand-placeholder svg {
+  width: 80px;
+  height: 80px;
+  color: var(--color-foreground-20);
+}
+
+/* Carousel Layout */
+.shop-by-brands .brands-carousel {
+  display: flex;
+  gap: 1rem;
+  overflow: hidden;
+  position: relative;
+  padding: 0 3rem;
+}
+
+.shop-by-brands .brands-carousel .brand-item {
+  flex: 0 0 auto;
+}
+
+@media screen and (max-width: 768px) {
+  .shop-by-brands .brands-carousel .brand-item {
+    width: calc(50% - 0.5rem);
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .shop-by-brands .brands-carousel .brand-item {
+    width: calc(20% - 0.8rem);
+  }
+}
+
+/* Navigation Buttons */
+.shop-by-brands .brands-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.shop-by-brands .brands-nav-btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-foreground-20);
+  border-radius: 50%;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.shop-by-brands .brands-nav-btn:hover {
+  background: var(--color-foreground);
+  color: var(--color-background);
+  border-color: var(--color-foreground);
+}
+
+.shop-by-brands .brands-nav-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media screen and (max-width: 749px) {
+  .shop-by-brands .brands-carousel {
+    padding: 0 2.5rem;
+  }
+  
+  .shop-by-brands .brands-nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .shop-by-brands .brands-nav-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
