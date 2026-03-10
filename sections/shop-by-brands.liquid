@@ -17,6 +17,7 @@
   .shop-by-brands-{{ section.id }} .brand-item {
     border: 1px solid var(--color-foreground-10);
     border-radius: {{ section.settings.border_radius }}px;
+    overflow: hidden;
   }
   {% endif %}
   
@@ -25,6 +26,9 @@
     padding: {{ section.settings.logo_padding }}px;
     height: {{ section.settings.logo_height }}px;
     width: {{ section.settings.logo_width }}px;
+    /* always clip children if image radius is set */
+    border-radius: {{ section.settings.image_radius }}px;
+    overflow: hidden;
   }
   
   /* image itself just fills the box and maintains aspect ratio */
