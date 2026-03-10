@@ -80,7 +80,7 @@
 /* Grid Layout */
 .shop-by-brands .brands-grid {
   display: grid;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .shop-by-brands .brands-grid--2-col-tablet {

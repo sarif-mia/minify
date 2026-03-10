@@ -23,6 +23,19 @@
   .shop-by-brands-{{ section.id }} .brand-item {
     padding: {{ section.settings.logo_padding }}px;
   }
+  
+  .shop-by-brands-{{ section.id }} .brand-item .brand-image {
+    height: {{ section.settings.logo_height }}px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: {{ section.settings.image_radius }}px;
+  }
+  
+  .shop-by-brands-{{ section.id }} .brand-item .brand-placeholder {
+    height: {{ section.settings.logo_height }}px;
+    border-radius: {{ section.settings.image_radius }}px;
+  }
 {%- endstyle -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient">
@@ -403,6 +416,16 @@
       "default": 8,
       "unit": "px",
       "label": "Border radius"
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "default": 0,
+      "unit": "px",
+      "label": "Image corner radius"
     },
     {
       "type": "color_scheme",
