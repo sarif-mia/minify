@@ -72,7 +72,7 @@ This file restructures settings as section-level instead of block-level.
     justify-content: center;
     /* remove container background so only the logo shows */
     background-color: transparent !important;
-    padding: {{ section.settings.logo_padding }}px;
+    padding: {{ section.settings.logo_padding_enabled | default: false | if: section.settings.logo_padding,0 }}px;
     border-radius: {{ section.settings.logo_border_radius }}px;
     border: {{ section.settings.logo_border_width }}px solid {{ section.settings.logo_border_color }};
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -409,6 +409,7 @@ This file restructures settings as section-level instead of block-level.
     {"type":"range","id":"logo_height_desktop","label":"Logo height on desktop","min":80,"max":300,"step":10,"unit":"px","default":150},
     {"type":"range","id":"logo_width_mobile","label":"Logo width on mobile","min":60,"max":200,"step":10,"unit":"px","default":100},
     {"type":"range","id":"logo_height_mobile","label":"Logo height on mobile","min":60,"max":200,"step":10,"unit":"px","default":100},
+    {"type":"checkbox","id":"logo_padding_enabled","label":"Enable logo padding","default":false},
     {"type":"range","id":"logo_padding","label":"Logo padding","min":0,"max":40,"step":5,"unit":"px","default":20},
     {"type":"color","id":"logo_background","label":"Logo background","default":"transparent"},
     {"type":"range","id":"logo_border_radius","label":"Logo border radius","min":0,"max":30,"step":2,"unit":"px","default":8},
