@@ -73,100 +73,67 @@
         "padding_bottom": 36
       }
     },
-    "shop_by_brands_JGptP7": {
-      "type": "shop-by-brands",
+    "1773126384bfadd4d5": {
+      "type": "_blocks",
       "blocks": {
-        "brand_CcRCT6": {
-          "type": "brand",
+        "ai_gen_block_753a4fe_adnw4J": {
+          "type": "ai_gen_block_753a4fe",
           "settings": {
-            "image": "shopify://shop_images/WEBSTIE_SIDE_IMAGE_jpg.jpg",
-            "link": "",
-            "open_new_tab": false
-          }
-        },
-        "brand_6KzgB3": {
-          "type": "brand",
-          "settings": {
-            "image": "shopify://shop_images/5_0bce627b-15e5-46f6-add1-8aee3c92c843.jpg",
-            "link": "",
-            "open_new_tab": false
-          }
-        },
-        "brand_gyz9hy": {
-          "type": "brand",
-          "settings": {
-            "image": "shopify://shop_images/ramona_5_a428abc5-cf52-4363-98d2-c97b2d57dfa8.jpg",
-            "link": "",
-            "open_new_tab": false
-          }
-        },
-        "brand_faDg9K": {
-          "type": "brand",
-          "settings": {
-            "image": "shopify://shop_images/PEACHY_DREAM_2.jpg",
-            "link": "",
-            "open_new_tab": false
-          }
-        },
-        "brand_BWPatm": {
-          "type": "brand",
-          "settings": {
-            "image": "shopify://shop_images/platmart-swatch-2871532.jpg",
-            "link": "",
-            "open_new_tab": false
-          }
-        },
-        "brand_QRCtNy": {
-          "type": "brand",
-          "settings": {
-            "image": "shopify://shop_images/dunamiss-email-signature.png",
-            "link": "",
-            "open_new_tab": false
-          }
+            "layout": "grid",
+            "section_width": 1400,
+            "section_padding_top": 50,
+            "section_padding_bottom": 50,
+            "background_color": "#ffffff",
+            "heading": "Shop by Brands",
+            "heading_size": 36,
+            "heading_color": "#121212",
+            "heading_margin": 12,
+            "description": "Explore our curated collection of premium brands",
+            "text_size": 16,
+            "text_color": "#666666",
+            "text_alignment": "center",
+            "header_spacing": 40,
+            "columns_desktop": 4,
+            "columns_mobile": "2",
+            "grid_gap": 20,
+            "logo_width_desktop": 150,
+            "logo_width_mobile": 100,
+            "logo_padding": 20,
+            "logo_background": "#f9f9f9",
+            "logo_border_radius": 8,
+            "logo_border_width": 1,
+            "logo_border_color": "#e5e5e5",
+            "carousel_navigation": "arrows",
+            "carousel_button_color": "#121212",
+            "carousel_button_hover_color": "#000000",
+            "carousel_button_icon_color": "#ffffff",
+            "carousel_dot_color": "#cccccc",
+            "carousel_dot_active_color": "#121212",
+            "brand_link_1": "",
+            "brand_link_2": "",
+            "brand_link_3": "",
+            "brand_link_4": "",
+            "brand_link_5": "",
+            "brand_link_6": "",
+            "brand_link_7": "",
+            "brand_link_8": "",
+            "brand_link_9": "",
+            "brand_link_10": "",
+            "brand_link_11": "",
+            "brand_link_12": ""
+          },
+          "blocks": {}
         }
       },
       "block_order": [
-        "brand_CcRCT6",
-        "brand_6KzgB3",
-        "brand_gyz9hy",
-        "brand_faDg9K",
-        "brand_BWPatm",
-        "brand_QRCtNy"
+        "ai_gen_block_753a4fe_adnw4J"
       ],
-      "name": "Shop by Brands",
-      "settings": {
-        "title": "Shop by Brands",
-        "heading_size": "h2",
-        "text": "",
-        "content_alignment": "left",
-        "section_width": "full",
-        "logo_height": 200,
-        "logo_width": 200,
-        "logo_height_mobile": 100,
-        "logo_width_mobile": 100,
-        "logo_padding": 4,
-        "enable_border": true,
-        "border_radius": 8,
-        "image_radius": 0,
-        "color_scheme": "",
-        "enable_carousel": true,
-        "carousel_gap": 0,
-        "columns_desktop": 5,
-        "visible_on_desktop": 5,
-        "columns_mobile": 2,
-        "visible_on_mobile": 2,
-        "enable_autoplay": true,
-        "autoplay_delay": 3000,
-        "pause_on_hover": true,
-        "navigation_style": "both",
-        "padding_top": 36,
-        "padding_bottom": 36
-      }
+      "settings": {}
     }
   },
   "order": [
     "slideshow_6Rqmqk",
     "featured_collection",
-    "shop_by_brands_JGptP7"
+    "1773126384bfadd4d5"
   ]
 }
