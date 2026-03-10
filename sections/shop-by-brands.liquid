@@ -20,21 +20,24 @@
   }
   {% endif %}
   
+  /* container sized by the editor so the image can scale freely */
   .shop-by-brands-{{ section.id }} .brand-item {
     padding: {{ section.settings.logo_padding }}px;
-  }
-  
-  .shop-by-brands-{{ section.id }} .brand-item .brand-image {
     height: {{ section.settings.logo_height }}px;
     width: {{ section.settings.logo_width }}px;
+  }
+  
+  /* image itself just fills the box and maintains aspect ratio */
+  .shop-by-brands-{{ section.id }} .brand-item .brand-image {
     max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
     border-radius: {{ section.settings.image_radius }}px;
   }
   
   .shop-by-brands-{{ section.id }} .brand-item .brand-placeholder {
-    height: {{ section.settings.logo_height }}px;
-    width: {{ section.settings.logo_width }}px;
+    height: 100%;
+    width: 100%;
     border-radius: {{ section.settings.image_radius }}px;
   }
 {%- endstyle -%}
@@ -80,12 +83,12 @@
                   {%- endif -%}
                   {%- if block.settings.image != blank -%}
                     <img
-                      src="{{ block.settings.image | image_url: width: 300 }}"
+                      src="{{ block.settings.image | image_url: width: section.settings.logo_width }}"
                       alt="{{ block.settings.image.alt | escape }}"
                       loading="lazy"
                       class="brand-image"
-                      width="{{ block.settings.image.width }}"
-                      height="{{ block.settings.image.height }}"
+                      width="{{ section.settings.logo_width }}"
+                      height="{{ section.settings.logo_height }}"
                     >
                   {%- else -%}
                     <div class="brand-placeholder">
@@ -385,8 +388,8 @@
     {
       "type": "range",
       "id": "logo_height",
-      "min": 40,
-      "max": 200,
+      "min": 20,
+      "max": 500,
       "step": 10,
       "default": 100,
       "unit": "px",
@@ -395,8 +398,8 @@
     {
       "type": "range",
       "id": "logo_width",
-      "min": 40,
-      "max": 200,
+      "min": 20,
+      "max": 500,
       "step": 10,
       "default": 100,
       "unit": "px",
