@@ -26,7 +26,8 @@ Copy/replace your existing section with this code to start anew.
 {% endstyle -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient">
-  <div class="page-width isolate section-{{ section.id }}-padding">
+  {% assign usePageWidth = section.settings.section_width == 'contained' %}
+  <div class="{% if usePageWidth %}page-width {% endif %}isolate section-{{ section.id }}-padding">
 
     {% if section.settings.title or section.settings.text %}
       <div class="brands-header brands-header--{{ section.settings.content_alignment }}">
@@ -135,8 +136,22 @@ Copy/replace your existing section with this code to start anew.
     },
     {
       "type": "header",
-      "content": "Brand Settings"
+      "content": "Section Layout"
     },
+    {
+      "type": "select",
+      "id": "section_width",
+      "options": [
+        { "value": "full", "label": "Full width" },
+        { "value": "contained", "label": "Contained (page-width)" }
+      ],
+      "default": "contained",
+      "label": "Section width"
+    },
+    {
+      "type": "header",
+      "content": "Brand Settings"
+    }
     {
       "type": "range",
       "id": "logo_height",
