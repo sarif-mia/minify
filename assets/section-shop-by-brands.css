@@ -135,7 +135,8 @@
 
 .shop-by-brands .brands-carousel .brand-item {
   flex-shrink: 0;
-  height: 80px;
+  height: 100px;
+  width: 100px;
 }
 
 /* Arrow Navigation */
