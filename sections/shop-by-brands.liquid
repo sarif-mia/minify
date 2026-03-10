@@ -20,6 +20,9 @@ Copy/replace your existing section with this code to start anew.
 
 /* container logic, radius/overflow applied here */
 .shop-by-brands-{{ section.id }} .brand-item { padding: {{ section.settings.logo_padding }}px; height: {{ section.settings.logo_height }}px; width: {{ section.settings.logo_width }}px; border-radius: {{ section.settings.image_radius }}px; overflow: hidden; box-sizing: border-box; }
+@media screen and (max-width: 749px) {
+  .shop-by-brands-{{ section.id }} .brand-item { height: {{ section.settings.logo_height_mobile }}px; width: {{ section.settings.logo_width_mobile }}px; }
+}
 {% if section.settings.enable_border %}
 .shop-by-brands-{{ section.id }} .brand-item { border: 1px solid var(--color-foreground-10); border-radius: {{ section.settings.border_radius }}px; }
 {% endif %}
@@ -159,7 +162,7 @@ Copy/replace your existing section with this code to start anew.
       "step": 10,
       "default": 100,
       "unit": "px",
-      "label": "Logo height"
+      "label": "Logo height (desktop)"
     },
     {
       "type": "range",
@@ -169,7 +172,27 @@ Copy/replace your existing section with this code to start anew.
       "step": 10,
       "default": 100,
       "unit": "px",
-      "label": "Logo width"
+      "label": "Logo width (desktop)"
+    },
+    {
+      "type": "range",
+      "id": "logo_height_mobile",
+      "min": 20,
+      "max": 500,
+      "step": 10,
+      "default": 100,
+      "unit": "px",
+      "label": "Logo height (mobile)"
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mobile",
+      "min": 20,
+      "max": 500,
+      "step": 10,
+      "default": 100,
+      "unit": "px",
+      "label": "Logo width (mobile)"
     },
     {
       "type": "range",

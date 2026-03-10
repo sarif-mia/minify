@@ -10,13 +10,19 @@ Accepts `block` and relies on `section` being in scope for settings.
   {%- endif -%}
 
   {%- if b.settings.image != blank -%}
+    {%- assign w_desktop = section.settings.logo_width -%}
+    {%- assign h_desktop = section.settings.logo_height -%}
+    {%- assign w_mobile = section.settings.logo_width_mobile | default: w_desktop -%}
+    {%- assign h_mobile = section.settings.logo_height_mobile | default: h_desktop -%}
     <img
-      src="{{ b.settings.image | image_url: width: section.settings.logo_width }}"
+      src="{{ b.settings.image | image_url: width: w_desktop }}"
+      srcset="{{ b.settings.image | image_url: width: w_mobile }} {{ w_mobile }}w, {{ b.settings.image | image_url: width: w_desktop }} {{ w_desktop }}w"
+      sizes="(max-width: 749px) {{ w_mobile }}px, {{ w_desktop }}px"
       alt="{{ b.settings.image.alt | escape }}"
       loading="lazy"
       class="brand-image"
-      width="{{ section.settings.logo_width }}"
-      height="{{ section.settings.logo_height }}"
+      width="{{ w_desktop }}"
+      height="{{ h_desktop }}"
     >
   {%- else -%}
     <div class="brand-placeholder">
