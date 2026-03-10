@@ -1,6 +1,942 @@
+{% doc %}
+  @prompt
+    do create a section shop by brands
+    header thekbe 
+    and text thakbe align kora lajbe
+    
+    er niche brand logo thakbe carousel and grid dui vabei use kora jabe
+    
+    desktop and mobile view er jonno aalda image size kroa jabe
+    
+    width control kora jabe section er 
+    
+    logo link up kora jabe
+    
+    do fully profesional way
+    
+    carousle icon or dot use kora jabe, eikahne dot and carousle ico duitai ase ami seect krote parbo jeta use korbo and image gula block akare hobe alala alaha block add kore image add korbo section e jemon add hoi
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-brand-section-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.section_padding_top }}px 0 {{ block.settings.section_padding_bottom }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-brand-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.section_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-brand-header-{{ ai_gen_id }} {
+    text-align: {{ block.settings.text_alignment }};
+    margin-bottom: {{ block.settings.header_spacing }}px;
+  }
+
+  .ai-brand-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+    margin: 0 0 {{ block.settings.heading_margin }}px;
+    font-weight: 600;
+  }
+
+  .ai-brand-text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.text_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .ai-brand-logos-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-brand-logos-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat({{ block.settings.columns_desktop }}, 1fr);
+    gap: {{ block.settings.grid_gap }}px;
+    {% if block.settings.layout == 'carousel' %}
+      display: none;
+    {% endif %}
+  }
+
+  .ai-brand-logos-carousel-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.grid_gap }}px;
+    transition: transform 0.5s ease;
+    {% if block.settings.layout == 'grid' %}
+      display: none;
+    {% endif %}
+  }
+
+  .ai-brand-logo-item-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: {{ block.settings.logo_padding }}px;
+    background-color: {{ block.settings.logo_background }};
+    border-radius: {{ block.settings.logo_border_radius }}px;
+    border: {{ block.settings.logo_border_width }}px solid {{ block.settings.logo_border_color }};
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-width: {% if block.settings.layout == 'carousel' %}calc((100% - ({{ block.settings.grid_gap }}px * {{ block.settings.columns_desktop | minus: 1 }})) / {{ block.settings.columns_desktop }}){% else %}auto{% endif %};
+    flex-shrink: 0;
+  }
+
+  .ai-brand-logo-item-{{ ai_gen_id }}:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-brand-logo-link-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ai-brand-logo-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    max-width: {{ block.settings.logo_width_desktop }}px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .ai-brand-logo-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: {{ block.settings.logo_width_desktop }}px;
+    margin: 0 auto;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+  }
+
+  .ai-brand-logo-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-brand-carousel-controls-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    {% if block.settings.layout == 'grid' %}
+      display: none;
+    {% endif %}
+  }
+
+  .ai-brand-carousel-button-{{ ai_gen_id }} {
+    background-color: {{ block.settings.carousel_button_color }};
+    color: {{ block.settings.carousel_button_icon_color }};
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .ai-brand-carousel-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.carousel_button_hover_color }};
+    transform: scale(1.1);
+  }
+
+  .ai-brand-carousel-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-brand-carousel-button-{{ ai_gen_id }}:disabled:hover {
+    transform: scale(1);
+  }
+
+  .ai-brand-carousel-dots-{{ ai_gen_id }} {
+    display: flex;
+    gap: 8px;
+    {% if block.settings.carousel_navigation == 'arrows' %}
+      display: none;
+    {% endif %}
+  }
+
+  .ai-brand-carousel-dot-{{ ai_gen_id }} {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: {{ block.settings.carousel_dot_color }};
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 0;
+  }
+
+  .ai-brand-carousel-dot-{{ ai_gen_id }}.active {
+    background-color: {{ block.settings.carousel_dot_active_color }};
+    transform: scale(1.3);
+  }
+
+  .ai-brand-carousel-arrows-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    {% if block.settings.carousel_navigation == 'dots' %}
+      display: none;
+    {% endif %}
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-brand-logos-grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat({{ block.settings.columns_mobile }}, 1fr);
+    }
+
+    .ai-brand-logo-item-{{ ai_gen_id }} {
+      min-width: {% if block.settings.layout == 'carousel' %}calc((100% - ({{ block.settings.grid_gap }}px * {{ block.settings.columns_mobile | minus: 1 }})) / {{ block.settings.columns_mobile }}){% else %}auto{% endif %};
+    }
+
+    .ai-brand-logo-image-{{ ai_gen_id }} {
+      max-width: {{ block.settings.logo_width_mobile }}px;
+    }
+
+    .ai-brand-logo-placeholder-{{ ai_gen_id }} {
+      max-width: {{ block.settings.logo_width_mobile }}px;
+    }
+
+    .ai-brand-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.8 }}px;
+    }
+
+    .ai-brand-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<brand-carousel-{{ ai_gen_id }} class="ai-brand-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-brand-container-{{ ai_gen_id }}">
+    {% if block.settings.heading != blank or block.settings.description != blank %}
+      <div class="ai-brand-header-{{ ai_gen_id }}">
+        {% if block.settings.heading != blank %}
+          <h2 class="ai-brand-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+        {% endif %}
+        {% if block.settings.description != blank %}
+          <div class="ai-brand-text-{{ ai_gen_id }}">{{ block.settings.description }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="ai-brand-logos-wrapper-{{ ai_gen_id }}">
+      <div class="ai-brand-logos-grid-{{ ai_gen_id }}">
+        {% for i in (1..12) %}
+          {% liquid
+            assign logo_key = 'brand_logo_' | append: i
+            assign link_key = 'brand_link_' | append: i
+            assign logo = block.settings[logo_key]
+            assign link = block.settings[link_key]
+          %}
+          
+          {% if logo != blank or link != blank %}
+            <div class="ai-brand-logo-item-{{ ai_gen_id }}">
+              {% if link != blank %}
+                <a href="{{ link }}" class="ai-brand-logo-link-{{ ai_gen_id }}" aria-label="Brand {{ i }}">
+              {% endif %}
+              
+              {% if logo != blank %}
+                <img
+                  src="{{ logo | image_url: width: 400 }}"
+                  alt="{{ logo.alt | escape }}"
+                  class="ai-brand-logo-image-{{ ai_gen_id }}"
+                  loading="lazy"
+                  width="{{ logo.width }}"
+                  height="{{ logo.height }}"
+                >
+              {% else %}
+                <div class="ai-brand-logo-placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+              
+              {% if link != blank %}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="ai-brand-logos-carousel-{{ ai_gen_id }}" data-carousel>
+        {% for i in (1..12) %}
+          {% liquid
+            assign logo_key = 'brand_logo_' | append: i
+            assign link_key = 'brand_link_' | append: i
+            assign logo = block.settings[logo_key]
+            assign link = block.settings[link_key]
+          %}
+          
+          {% if logo != blank or link != blank %}
+            <div class="ai-brand-logo-item-{{ ai_gen_id }}">
+              {% if link != blank %}
+                <a href="{{ link }}" class="ai-brand-logo-link-{{ ai_gen_id }}" aria-label="Brand {{ i }}">
+              {% endif %}
+              
+              {% if logo != blank %}
+                <img
+                  src="{{ logo | image_url: width: 400 }}"
+                  alt="{{ logo.alt | escape }}"
+                  class="ai-brand-logo-image-{{ ai_gen_id }}"
+                  loading="lazy"
+                  width="{{ logo.width }}"
+                  height="{{ logo.height }}"
+                >
+              {% else %}
+                <div class="ai-brand-logo-placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+              
+              {% if link != blank %}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="ai-brand-carousel-controls-{{ ai_gen_id }}">
+      <div class="ai-brand-carousel-arrows-{{ ai_gen_id }}">
+        <button
+          class="ai-brand-carousel-button-{{ ai_gen_id }}"
+          data-prev
+          aria-label="Previous slide"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button
+          class="ai-brand-carousel-button-{{ ai_gen_id }}"
+          data-next
+          aria-label="Next slide"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="ai-brand-carousel-dots-{{ ai_gen_id }}" data-dots></div>
+    </div>
+  </div>
+</brand-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class BrandCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.itemsPerPage = {{ block.settings.columns_desktop }};
+        this.itemsPerPageMobile = {{ block.settings.columns_mobile }};
+      }
+
+      connectedCallback() {
+        this.carousel = this.querySelector('[data-carousel]');
+        this.prevButton = this.querySelector('[data-prev]');
+        this.nextButton = this.querySelector('[data-next]');
+        this.dotsContainer = this.querySelector('[data-dots]');
+        
+        if (!this.carousel) return;
+
+        this.items = Array.from(this.carousel.children);
+        this.totalItems = this.items.length;
+        
+        this.updateItemsPerPage();
+        this.createDots();
+        this.updateCarousel();
+        this.setupEventListeners();
+        
+        window.addEventListener('resize', () => {
+          this.updateItemsPerPage();
+          this.createDots();
+          this.updateCarousel();
+        });
+      }
+
+      updateItemsPerPage() {
+        this.itemsPerPage = window.innerWidth <= 749 
+          ? this.itemsPerPageMobile 
+          : {{ block.settings.columns_desktop }};
+        this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+      }
+
+      setupEventListeners() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.prev());
+        }
+        
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.next());
+        }
+      }
+
+      createDots() {
+        if (!this.dotsContainer) return;
+        
+        this.dotsContainer.innerHTML = '';
+        
+        for (let i = 0; i < this.totalPages; i++) {
+          const dot = document.createElement('button');
+          dot.className = 'ai-brand-carousel-dot-{{ ai_gen_id }}';
+          dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+          
+          if (i === this.currentIndex) {
+            dot.classList.add('active');
+          }
+          
+          dot.addEventListener('click', () => {
+            this.currentIndex = i;
+            this.updateCarousel();
+          });
+          
+          this.dotsContainer.appendChild(dot);
+        }
+      }
+
+      updateCarousel() {
+        const offset = -this.currentIndex * 100;
+        this.carousel.style.transform = `translateX(${offset}%)`;
+        
+        if (this.prevButton) {
+          this.prevButton.disabled = this.currentIndex === 0;
+        }
+        
+        if (this.nextButton) {
+          this.nextButton.disabled = this.currentIndex >= this.totalPages - 1;
+        }
+        
+        const dots = this.dotsContainer?.querySelectorAll('.ai-brand-carousel-dot-{{ ai_gen_id }}');
+        if (dots) {
+          dots.forEach((dot, index) => {
+            if (index === this.currentIndex) {
+              dot.classList.add('active');
+            } else {
+              dot.classList.remove('active');
+            }
+          });
+        }
+      }
+
+      prev() {
+        if (this.currentIndex > 0) {
+          this.currentIndex--;
+          this.updateCarousel();
+        }
+      }
+
+      next() {
+        if (this.currentIndex < this.totalPages - 1) {
+          this.currentIndex++;
+          this.updateCarousel();
+        }
+      }
+    }
+
+    customElements.define('brand-carousel-{{ ai_gen_id }}', BrandCarousel{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Shop by brands",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section settings"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "section_width",
+      "label": "Section width",
+      "min": 1000,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by Brands"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#121212"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin",
+      "label": "Heading margin bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Explore our curated collection of premium brands"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#666666"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "header_spacing",
+      "label": "Header spacing",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Grid gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Logo style"
+    },
+    {
+      "type": "range",
+      "id": "logo_width_desktop",
+      "label": "Logo width on desktop",
+      "min": 80,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mobile",
+      "label": "Logo width on mobile",
+      "min": 60,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "logo_padding",
+      "label": "Logo padding",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "logo_background",
+      "label": "Logo background",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "range",
+      "id": "logo_border_radius",
+      "label": "Logo border radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "logo_border_width",
+      "label": "Logo border width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "logo_border_color",
+      "label": "Logo border color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "header",
+      "content": "Carousel navigation"
+    },
+    {
+      "type": "select",
+      "id": "carousel_navigation",
+      "label": "Navigation type",
+      "options": [
+        {
+          "value": "arrows",
+          "label": "Arrows only"
+        },
+        {
+          "value": "dots",
+          "label": "Dots only"
+        },
+        {
+          "value": "both",
+          "label": "Both arrows and dots"
+        }
+      ],
+      "default": "both"
+    },
+    {
+      "type": "color",
+      "id": "carousel_button_color",
+      "label": "Button color",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "carousel_button_hover_color",
+      "label": "Button hover color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "carousel_button_icon_color",
+      "label": "Button icon color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "carousel_dot_color",
+      "label": "Dot color",
+      "default": "#cccccc"
+    },
+    {
+      "type": "color",
+      "id": "carousel_dot_active_color",
+      "label": "Dot active color",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Brand 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_1",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_1",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_2",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_2",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_3",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_3",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_4",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_4",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_5",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_5",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_6",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_6",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_7",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_7",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_8",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_8",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_9",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_9",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_10",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_10",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 11"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_11",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_11",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Brand 12"
+    },
+    {
+      "type": "image_picker",
+      "id": "brand_logo_12",
+      "label": "Logo"
+    },
+    {
+      "type": "url",
+      "id": "brand_link_12",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by brands"
+    }
+  ]
+}
 {% endschema %}
