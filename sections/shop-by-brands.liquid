@@ -26,8 +26,7 @@ Copy/replace your existing section with this code to start anew.
 {% endstyle -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient">
-  {% assign usePageWidth = section.settings.section_width == 'contained' %}
-  <div class="{% if usePageWidth %}page-width {% endif %}isolate section-{{ section.id }}-padding">
+  <div class="{% if section.settings.section_width == 'contained' %}page-width {% endif %}isolate section-{{ section.id }}-padding">
 
     {% if section.settings.title or section.settings.text %}
       <div class="brands-header brands-header--{{ section.settings.content_alignment }}">
