@@ -69,6 +69,13 @@
     {%- endif -%}
 
     {%- if section.blocks.size > 0 -%}
+      {%- assign mobileCount = section.settings.columns_mobile -%}
+      {%- assign desktopCount = section.settings.columns_desktop -%}
+      {%- if section.settings.enable_carousel -%}
+        {%- assign mobileCount = section.settings.visible_on_mobile -%}
+        {%- assign desktopCount = section.settings.visible_on_desktop -%}
+      {%- endif -%}
+
       <div class="brands-wrapper shop-by-brands-{{ section.id }}">
         
         {%- if section.settings.enable_carousel -%}
@@ -109,8 +116,9 @@
           {%- endif -%}
 
         {%- else -%}
-          {%- comment -%} Grid mode is simpler; just render bodies {%- endcomment -%}
-          <div class="brands-grid brands-grid--{{ section.settings.columns_mobile }}-col-tablet brands-grid--{{ section.settings.columns_desktop }}-col-desktop">
+          {%- comment -%} Grid mode is simpler; use the same numbers from above so mobile/desktop values
+              behave consistently whether carousel is on or off {%- endcomment -%}
+          <div class="brands-grid brands-grid--{{ mobileCount }}-col-tablet brands-grid--{{ desktopCount }}-col-desktop">
             {%- for block in section.blocks -%}
               {%- render 'brand-logo' block: block -%}
             {%- endfor -%}
@@ -280,7 +288,7 @@
       "max": 8,
       "step": 1,
       "default": 5,
-      "label": "Visible items in carousel"
+      "label": "Visible items on desktop (carousel/grid)"
     },
     {
       "type": "header",
@@ -302,7 +310,7 @@
       "max": 4,
       "step": 1,
       "default": 2,
-      "label": "Visible items in carousel"
+      "label": "Visible items on mobile (carousel/grid)"
     },
     {
       "type": "header",
