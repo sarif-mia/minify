@@ -70,10 +70,14 @@
         {%- if section.settings.enable_carousel -%}
           {%- comment -%} Carousel mode: place controls and data attributes for the JS initializer {%- endcomment -%}
           <div class="brands-carousel-wrapper"
+               tabindex="0"
+               aria-live="polite"
                data-section-id="{{ section.id }}"
                data-visible-on-desktop="{{ section.settings.visible_on_desktop }}"
                data-visible-on-mobile="{{ section.settings.visible_on_mobile }}"
+               data-enable-autoplay="{{ section.settings.enable_autoplay }}"
                data-autoplay-delay="{{ section.settings.autoplay_delay }}"
+               data-pause-on-hover="{{ section.settings.pause_on_hover }}"
                data-navigation-style="{{ section.settings.navigation_style }}"
                data-carousel-gap="{{ section.settings.carousel_gap }}">
 
@@ -301,6 +305,12 @@
       "content": "Carousel Settings"
     },
     {
+      "type": "checkbox",
+      "id": "enable_autoplay",
+      "default": true,
+      "label": "Enable autoplay"
+    },
+    {
       "type": "range",
       "id": "autoplay_delay",
       "min": 2000,
@@ -309,6 +319,12 @@
       "default": 3000,
       "unit": "ms",
       "label": "Autoplay delay"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "default": true,
+      "label": "Pause on hover"
     },
     {
       "type": "select",

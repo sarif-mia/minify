@@ -15,7 +15,9 @@
 
     const desktopVisible = parseInt(wrapper.dataset.visibleOnDesktop || 5, 10);
     const mobileVisible = parseInt(wrapper.dataset.visibleOnMobile || 2, 10);
+    const enableAutoplay = wrapper.dataset.enableAutoplay === 'true';
     const autoPlayDelay = parseInt(wrapper.dataset.autoplayDelay || 3000, 10);
+    const pauseOnHover = wrapper.dataset.pauseOnHover === 'true';
     const navStyle = wrapper.dataset.navigationStyle || 'arrows';
     const gap = parseInt(wrapper.dataset.carouselGap || 24, 10);
 
@@ -53,6 +55,9 @@
         item.style.maxWidth = `${itemWidth}px`;
       });
 
+      // announce slide position for screen readers
+      wrapper.setAttribute('aria-roledescription', `Slide ${currentIndex + 1} of ${totalItems}`);
+
       if (dotsContainer && (navStyle === 'dots' || navStyle === 'both')) {
         const dots = dotsContainer.querySelectorAll('.brand-dot');
         dots.forEach((dot, idx) => {
@@ -81,6 +86,7 @@
     }
 
     function startAutoPlay() {
+      if (!enableAutoplay) return;
       if (autoPlayDelay > 0) intervalId = setInterval(nextSlide, autoPlayDelay);
     }
 
@@ -103,8 +109,23 @@
     if (prevBtn) prevBtn.addEventListener('click', () => { stopAutoPlay(); prevSlide(); startAutoPlay(); });
     if (nextBtn) nextBtn.addEventListener('click', () => { stopAutoPlay(); nextSlide(); startAutoPlay(); });
 
-    wrapper.addEventListener('mouseenter', stopAutoPlay);
-    wrapper.addEventListener('mouseleave', startAutoPlay);
+    if (pauseOnHover) {
+      wrapper.addEventListener('mouseenter', stopAutoPlay);
+      wrapper.addEventListener('mouseleave', startAutoPlay);
+    }
+
+    // keyboard navigation
+    wrapper.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        stopAutoPlay();
+        nextSlide();
+        startAutoPlay();
+      } else if (e.key === 'ArrowLeft') {
+        stopAutoPlay();
+        prevSlide();
+        startAutoPlay();
+      }
+    });
 
     // touch support
     let touchStartX = 0;
