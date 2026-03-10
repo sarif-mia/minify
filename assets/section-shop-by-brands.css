@@ -107,12 +107,6 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: grayscale(100%);
-  transition: filter 0.3s ease;
-}
-
-.shop-by-brands .brand-item:hover .brand-image {
-  filter: grayscale(0%);
 }
 
 .shop-by-brands .brand-placeholder {
@@ -158,6 +152,7 @@
 .shop-by-brands .brands-nav {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 1rem;
   margin-top: 1.5rem;
 }
@@ -174,6 +169,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .shop-by-brands .brands-nav-btn:hover {
@@ -185,6 +181,33 @@
 .shop-by-brands .brands-nav-btn svg {
   width: 20px;
   height: 20px;
+}
+
+/* Dots Navigation */
+.shop-by-brands .brands-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.shop-by-brands .brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-foreground-20);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  padding: 0;
+}
+
+.shop-by-brands .brand-dot:hover {
+  background: var(--color-foreground-40);
+}
+
+.shop-by-brands .brand-dot.active {
+  background: var(--color-foreground);
+  transform: scale(1.2);
 }
 
 @media screen and (max-width: 749px) {

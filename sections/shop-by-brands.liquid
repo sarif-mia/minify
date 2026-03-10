@@ -115,6 +115,7 @@
     const autoPlayDelay = {{ section.settings.autoplay_delay | default: 3000 }};
     const desktopVisible = {{ section.settings.visible_on_desktop | default: 5 }};
     const mobileVisible = {{ section.settings.visible_on_mobile | default: 2 }};
+    const navStyle = '{{ section.settings.navigation_style | default: 'arrows' }}';
 
     function getVisibleCount() {
       if (window.innerWidth <= 768) {
@@ -142,6 +143,16 @@
           item.style.display = 'none';
         }
       });
+      
+      // Update dots if they exist
+      const dots = section.parentElement.querySelectorAll('.brand-dot');
+      dots.forEach((dot, index) => {
+        if (index >= currentIndex && index < currentIndex + visible) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
     }
 
     function nextSlide() {
@@ -158,37 +169,72 @@
       updateCarousel();
     }
 
-    // Create navigation buttons
+    // Create navigation container
     const navContainer = document.createElement('div');
     navContainer.className = 'brands-nav';
-    navContainer.innerHTML = `
-      <button class="brands-nav-btn brands-prev" aria-label="Previous">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-      </button>
-      <button class="brands-nav-btn brands-next" aria-label="Next">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
-    `;
+    
+    // Add arrows if selected
+    if (navStyle === 'arrows' || navStyle === 'both') {
+      navContainer.innerHTML += `
+        <button class="brands-nav-btn brands-prev" aria-label="Previous">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      `;
+    }
+    
+    // Add dots if selected
+    if (navStyle === 'dots' || navStyle === 'both') {
+      const dotsContainer = document.createElement('div');
+      dotsContainer.className = 'brands-dots';
+      items.forEach((_, index) => {
+        const dot = document.createElement('span');
+        dot.className = 'brand-dot';
+        dot.setAttribute('data-index', index);
+        dot.addEventListener('click', function() {
+          currentIndex = index;
+          clearInterval(intervalId);
+          updateCarousel();
+          intervalId = setInterval(nextSlide, autoPlayDelay);
+        });
+        dotsContainer.appendChild(dot);
+      });
+      navContainer.appendChild(dotsContainer);
+    }
+    
+    // Add next arrow if arrows are selected (after dots)
+    if (navStyle === 'arrows' || navStyle === 'both') {
+      navContainer.innerHTML += `
+        <button class="brands-nav-btn brands-next" aria-label="Next">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      `;
+    }
+    
     section.parentElement.appendChild(navContainer);
 
+    // Add event listeners for arrows
     const prevBtn = navContainer.querySelector('.brands-prev');
     const nextBtn = navContainer.querySelector('.brands-next');
 
-    prevBtn.addEventListener('click', function() {
-      clearInterval(intervalId);
-      prevSlide();
-      intervalId = setInterval(nextSlide, autoPlayDelay);
-    });
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function() {
+        clearInterval(intervalId);
+        prevSlide();
+        intervalId = setInterval(nextSlide, autoPlayDelay);
+      });
+    }
 
-    nextBtn.addEventListener('click', function() {
-      clearInterval(intervalId);
-      nextSlide();
-      intervalId = setInterval(nextSlide, autoPlayDelay);
-    });
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function() {
+        clearInterval(intervalId);
+        nextSlide();
+        intervalId = setInterval(nextSlide, autoPlayDelay);
+      });
+    }
 
     // Pause on hover
     section.addEventListener('mouseenter', function() {
@@ -342,6 +388,26 @@
       "default": 3000,
       "unit": "ms",
       "label": "Autoplay delay"
+    },
+    {
+      "type": "select",
+      "id": "navigation_style",
+      "options": [
+        {
+          "value": "arrows",
+          "label": "Arrows"
+        },
+        {
+          "value": "dots",
+          "label": "Dots"
+        },
+        {
+          "value": "both",
+          "label": "Both"
+        }
+      ],
+      "default": "arrows",
+      "label": "Navigation style"
     },
     {
       "type": "header",
